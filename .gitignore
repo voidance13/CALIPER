@@ -1,0 +1,10 @@
+data/
+retrieve_fine_tuning/models/
+*.id
+*.tar.gz
+*.txt
+*.bin
+*.train
+*.valid
+*.json
+*.jsonl
