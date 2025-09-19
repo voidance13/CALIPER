@@ -2,16 +2,16 @@ import json
 
 # with open(f"data/2wikimultihopqa/test_retrieved.json") as file:
 #     samples = json.load(file)
-with open(f"data/2wikimultihopqa/test_retrieved_embedderft_rerankerft.json") as file:
-    samples = json.load(file)
+# with open(f"data/2wikimultihopqa/test_retrieved_embedderft_rerankerft.json") as file:
+#     samples = json.load(file)
 # with open(f"data/hotpotqa/test_retrieved.json") as file:
 #     samples = json.load(file)
 # with open(f"data/hotpotqa/test_retrieved_embedderft_rerankerft.json") as file:
 #     samples = json.load(file)
 # with open(f"data/musique/test_retrieved.json") as file:
 #     samples = json.load(file)
-# with open(f"data/musique/test_retrieved_embedderft_rerankerft.json") as file:
-#     samples = json.load(file)
+with open(f"data/musique/test_retrieved_embedderft_rerankerft.json") as file:
+    samples = json.load(file)
 
 hit3_total = 0
 hit5_total = 0

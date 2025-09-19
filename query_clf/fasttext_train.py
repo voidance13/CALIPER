@@ -4,8 +4,7 @@ import jieba
 import json
 import re
 
-# 读取停用词
-stopwords = {word.strip() for word in open('intent_detection/stopwords.txt', encoding='utf-8')}
+stopwords = {word.strip() for word in open('query_clf/stopwords.txt', encoding='utf-8')}
 
 
 def clean_text(text):
@@ -16,9 +15,9 @@ def clean_text(text):
 
 
 def preprocess():
-    with open("intent_detection/train/hotpotqa10000.json") as f:
+    with open("query_clf/train/hotpotqa10000.json") as f:
         hotpotqa = json.load(f)
-    with open("intent_detection/train/musique10000.json") as f:
+    with open("query_clf/train/musique10000.json") as f:
         musique = json.load(f)
 
     data_list = []
@@ -47,17 +46,17 @@ def preprocess():
     train_data = random.sample(data_list, int(size * 0.8))
     valid_data = [i for i in data_list if i not in train_data]
 
-    with open("intent_detection/train/hotpotqa_test2000_easy.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_easy.json") as f:
         hotpotqa_test2000_easy = json.load(f)
-    with open("intent_detection/train/hotpotqa_test2000_middle.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_middle.json") as f:
         hotpotqa_test2000_middle = json.load(f)
-    with open("intent_detection/train/hotpotqa_test2000_hard.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_hard.json") as f:
         hotpotqa_test2000_hard = json.load(f)
-    with open("intent_detection/train/musique_test2000_easy.json") as f:
+    with open("query_clf/train/musique_test2000_easy.json") as f:
         musique_test2000_easy = json.load(f)
-    with open("intent_detection/train/musique_test2000_middle.json") as f:
+    with open("query_clf/train/musique_test2000_middle.json") as f:
         musique_test2000_middle = json.load(f)
-    with open("intent_detection/train/musique_test2000_hard.json") as f:
+    with open("query_clf/train/musique_test2000_hard.json") as f:
         musique_test2000_hard = json.load(f)
 
     hotpotqa_test_easy = []
@@ -122,14 +121,14 @@ def preprocess():
         # musique_test_hard.append("__label__" + sample["intent_type"] + " " + clean_text(sample["question"] + text) + "\n")
         musique_test_hard.append("__label__" + sample["intent_type"] + " " + clean_text(sample["question"]) + "\n")
 
-    open("intent_detection/train/train.txt", 'w', encoding='utf-8').writelines(train_data)
-    open("intent_detection/train/valid.txt", 'w', encoding='utf-8').writelines(valid_data)
-    open("intent_detection/train/hotpotqa_test2000_easy.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_easy)
-    open("intent_detection/train/hotpotqa_test2000_middle.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_middle)
-    open("intent_detection/train/hotpotqa_test2000_hard.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_hard)
-    open("intent_detection/train/musique_test2000_easy.txt", 'w', encoding='utf-8').writelines(musique_test_easy)
-    open("intent_detection/train/musique_test2000_middle.txt", 'w', encoding='utf-8').writelines(musique_test_middle)
-    open("intent_detection/train/musique_test2000_hard.txt", 'w', encoding='utf-8').writelines(musique_test_hard)
+    open("query_clf/train/train.txt", 'w', encoding='utf-8').writelines(train_data)
+    open("query_clf/train/valid.txt", 'w', encoding='utf-8').writelines(valid_data)
+    open("query_clf/train/hotpotqa_test2000_easy.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_easy)
+    open("query_clf/train/hotpotqa_test2000_middle.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_middle)
+    open("query_clf/train/hotpotqa_test2000_hard.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_hard)
+    open("query_clf/train/musique_test2000_easy.txt", 'w', encoding='utf-8').writelines(musique_test_easy)
+    open("query_clf/train/musique_test2000_middle.txt", 'w', encoding='utf-8').writelines(musique_test_middle)
+    open("query_clf/train/musique_test2000_hard.txt", 'w', encoding='utf-8').writelines(musique_test_hard)
 
     total = hotpotqa_test_easy
     total.extend(hotpotqa_test_middle)
@@ -137,13 +136,13 @@ def preprocess():
     total.extend(musique_test_easy)
     total.extend(musique_test_middle)
     total.extend(musique_test_hard)
-    open("intent_detection/train/test_total.txt", 'w', encoding='utf-8').writelines(total)
+    open("query_clf/train/test_total.txt", 'w', encoding='utf-8').writelines(total)
 
 
 def preprocess_bi():
-    with open("intent_detection/train/hotpotqa10000.json") as f:
+    with open("query_clf/train/hotpotqa10000.json") as f:
         hotpotqa = json.load(f)
-    with open("intent_detection/train/musique10000.json") as f:
+    with open("query_clf/train/musique10000.json") as f:
         musique = json.load(f)
 
     data_list = []
@@ -192,17 +191,17 @@ def preprocess_bi():
     train_data = random.sample(data_list, int(size * 0.8))
     valid_data = [i for i in data_list if i not in train_data]
 
-    with open("intent_detection/train/hotpotqa_test2000_easy.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_easy.json") as f:
         hotpotqa_test2000_easy = json.load(f)
-    with open("intent_detection/train/hotpotqa_test2000_middle.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_middle.json") as f:
         hotpotqa_test2000_middle = json.load(f)
-    with open("intent_detection/train/hotpotqa_test2000_hard.json") as f:
+    with open("query_clf/train/hotpotqa_test2000_hard.json") as f:
         hotpotqa_test2000_hard = json.load(f)
-    with open("intent_detection/train/musique_test2000_easy.json") as f:
+    with open("query_clf/train/musique_test2000_easy.json") as f:
         musique_test2000_easy = json.load(f)
-    with open("intent_detection/train/musique_test2000_middle.json") as f:
+    with open("query_clf/train/musique_test2000_middle.json") as f:
         musique_test2000_middle = json.load(f)
-    with open("intent_detection/train/musique_test2000_hard.json") as f:
+    with open("query_clf/train/musique_test2000_hard.json") as f:
         musique_test2000_hard = json.load(f)
 
     hotpotqa_test_easy = []
@@ -265,61 +264,47 @@ def preprocess_bi():
         # musique_test_hard.append("__label__hard " + clean_text(sample["question"] + text) + "\n")
         musique_test_hard.append("__label__hard " + clean_text(sample["question"]) + "\n")
 
-    open("intent_detection/train/train_bi.txt", 'w', encoding='utf-8').writelines(train_data)
-    open("intent_detection/train/valid_bi.txt", 'w', encoding='utf-8').writelines(valid_data)
-    open("intent_detection/train/hotpotqa_test2000_easy_bi.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_easy)
-    open("intent_detection/train/hotpotqa_test2000_hard_bi.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_hard)
-    open("intent_detection/train/musique_test2000_easy_bi.txt", 'w', encoding='utf-8').writelines(musique_test_easy)
-    open("intent_detection/train/musique_test2000_hard_bi.txt", 'w', encoding='utf-8').writelines(musique_test_hard)
+    open("query_clf/train/train_bi.txt", 'w', encoding='utf-8').writelines(train_data)
+    open("query_clf/train/valid_bi.txt", 'w', encoding='utf-8').writelines(valid_data)
+    open("query_clf/train/hotpotqa_test2000_easy_bi.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_easy)
+    open("query_clf/train/hotpotqa_test2000_hard_bi.txt", 'w', encoding='utf-8').writelines(hotpotqa_test_hard)
+    open("query_clf/train/musique_test2000_easy_bi.txt", 'w', encoding='utf-8').writelines(musique_test_easy)
+    open("query_clf/train/musique_test2000_hard_bi.txt", 'w', encoding='utf-8').writelines(musique_test_hard)
 
     total = hotpotqa_test_easy
     total.extend(hotpotqa_test_hard)
     total.extend(musique_test_easy)
     total.extend(musique_test_hard)
-    open("intent_detection/train/test_total_bi.txt", 'w', encoding='utf-8').writelines(total)
+    open("query_clf/train/test_total_bi.txt", 'w', encoding='utf-8').writelines(total)
 
 
 def train():
-    model = fasttext.train_supervised(input="intent_detection/train/train.txt",
-                                      autotuneValidationFile='intent_detection/train/valid.txt',
+    model = fasttext.train_supervised(input="query_clf/train/train.txt",
+                                      autotuneValidationFile='query_clf/train/valid.txt',
                                       autotuneDuration=10,
                                     #   autotuneModelSize="60M",
                                       autotuneMetric='f1',
                                       verbose=3)
-    # print(model.test("intent_detection/train/hotpotqa_test2000_easy.txt"))
-    # print(model.test("intent_detection/train/hotpotqa_test2000_middle.txt"))
-    # print(model.test("intent_detection/train/hotpotqa_test2000_hard.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_easy.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_middle.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_hard.txt"))
-    # print(model.test("intent_detection/train/test_total.txt"))
 
-    model.save_model('intent_detection/train/train.bin')
+    model.save_model('query_clf/train/train.bin')
 
 
 def train_bi():
-    model = fasttext.train_supervised(input="intent_detection/train/train_bi.txt",
-                                      autotuneValidationFile='intent_detection/train/valid_bi.txt',
+    model = fasttext.train_supervised(input="query_clf/train/train_bi.txt",
+                                      autotuneValidationFile='query_clf/train/valid_bi.txt',
                                       autotuneDuration=10,
                                     #   autotuneModelSize="60M",
                                       autotuneMetric='f1',
                                       verbose=3)
-    # print(model.test("intent_detection/train/hotpotqa_test2000_easy.txt"))
-    # print(model.test("intent_detection/train/hotpotqa_test2000_middle.txt"))
-    # print(model.test("intent_detection/train/hotpotqa_test2000_hard.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_easy.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_middle.txt"))
-    # print(model.test("intent_detection/train/musique_test2000_hard.txt"))
-    # print(model.test("intent_detection/train/test_total.txt"))
 
-    model.save_model('intent_detection/train/train_bi.bin')
+    model.save_model('query_clf/train/train_bi.bin')
 
 
 def test():
-    model = fasttext.load_model('intent_detection/train/train.bin')
+    model = fasttext.load_model('query_clf/train/train.bin')
 
     labels, inputs = [], []
-    for line in open('intent_detection/train/test_total.txt', encoding='utf-8'):
+    for line in open('query_clf/train/test_total.txt', encoding='utf-8'):
         line = line.split()
         labels.append(line[0])
         inputs.append(' '.join(line[1:]))
@@ -353,10 +338,10 @@ def test():
 
 
 def test_bi():
-    model = fasttext.load_model('intent_detection/train/train_bi.bin')
+    model = fasttext.load_model('query_clf/train/train_bi.bin')
 
     samples, inputs = [], []
-    for line in open('intent_detection/train/test_total_bi.txt', encoding='utf-8'):
+    for line in open('query_clf/train/test_total_bi.txt', encoding='utf-8'):
         sample = line.split()
         samples.append(sample)
         inputs.append(' '.join(sample[1:]))

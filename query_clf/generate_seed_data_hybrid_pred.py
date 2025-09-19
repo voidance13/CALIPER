@@ -29,22 +29,15 @@ def generate_steps(dataset, large_model):
             base_url="http://localhost:6006/v1",
         )
     elif large_model == "deepseek-r1" or large_model == "deepseek-v3":
-        # client = OpenAI(
-        #     api_key="sk-609217c7b16a49c7a73e2752906f3acc",
-        #     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        # )
         client = OpenAI(
-            api_key="sk-jnomkPZiYo4qHsaGXf1aCniwT71lcENjI3CiUH5IU1OlCHFc",
-            base_url="https://api.lkeap.cloud.tencent.com/v1",
+            api_key="",
+            base_url="",
         )
 
     result = []
 
     for sample in tqdm(dev[:2000]):
-        if dataset == "news_articles":
-            question = sample["query"]
-        else:
-            question = sample["question"]
+        question = sample["question"]
         
         try:
             response = client.chat.completions.create(
@@ -79,15 +72,11 @@ def hybrid_predict(dataset, use_best_hit=False, retrieve_step_by_step=False, sma
     for item in tqdm(dev[:2000]):
         if use_best_hit:
             text = ""
-            if dataset == "news_articles":
-                for evidence in item["evidence_list"]:
-                    text += evidence["fact"] + "\n"
-            else:
-                ctxs = []
-                for ctx in item["ctxs"]:
-                    ctxs.append(ctx["sentences"])
-                for supporting_fact in item["supporting_facts"]:
-                    text += ctxs[supporting_fact[0]][supporting_fact[1]] + "\n"
+            ctxs = []
+            for ctx in item["ctxs"]:
+                ctxs.append(ctx["sentences"])
+            for supporting_fact in item["supporting_facts"]:
+                text += ctxs[supporting_fact[0]][supporting_fact[1]] + "\n"
             text = text[:-1]
         else:
             text = item["retrieved_text"]
@@ -96,16 +85,11 @@ def hybrid_predict(dataset, use_best_hit=False, retrieve_step_by_step=False, sma
             steps = item["72b_generate_steps"]
         else:
             steps = ""
-        if dataset == "news_articles":
-            # instruction = "You are a helpful assistant. According to given steps and articles, answer the given question. Output the executing result of every step. Then output the final answer as short as possible. If given corpus is not sufficient enough to answer the question, output \"Insufficient information.\". If the question is a yes-no question, just output \"yes\", \"no\" or \"Insufficient information.\"."
-            # prompt = "Question:\n" + item["query"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text
-            instruction = "You are a helpful assistant. According to given steps and articles, answer the given question."
-            prompt = "Question:\n" + item["query"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text + "\n\nOutput the executing result of every step. Then output the final answer as short as possible. If given corpus is not sufficient enough to answer the question, output the final answer as \"Insufficient information.\". If the question is a yes-no question, just output the final answer as \"yes\", \"no\" or \"Insufficient information.\"."
-        else:
-            instruction = "You are a helpful assistant. According to given steps and articles, answer the given question. Output the executing result of every step. Then output the final answer as short as possible."
-            prompt = "Question:\n" + item["question"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text
-            # instruction = "You are a helpful assistant. According to given steps and articles, answer the given question. Output the executing result of every step. Then output the final answer as short as possible. If the question is a yes-no question, just output \"yes\" or \"no\"."
-            # prompt = "Question:\n" + item["question"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text
+        
+        instruction = "You are a helpful assistant. According to given steps and articles, answer the given question. Output the executing result of every step. Then output the final answer as short as possible."
+        prompt = "Question:\n" + item["question"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text
+        # instruction = "You are a helpful assistant. According to given steps and articles, answer the given question. Output the executing result of every step. Then output the final answer as short as possible. If the question is a yes-no question, just output \"yes\" or \"no\"."
+        # prompt = "Question:\n" + item["question"] + "\n\nSteps:\n" + steps + "\n\nCorpus:\n" + text
 
         response = client.chat.completions.create(
             model=small_model,
@@ -117,24 +101,15 @@ def hybrid_predict(dataset, use_best_hit=False, retrieve_step_by_step=False, sma
 
         res = response.choices[0].message.content
         # print(res)
-        if dataset == "news_articles":
-            answers.append(
-                {
-                    "id": item["id"],
-                    "question": item["query"],
-                    "answer": item["answer"],
-                    "pred": res
-                }
-            )
-        else:
-            answers.append(
-                {
-                    "id": item["id"],
-                    "question": item["question"],
-                    "answer": item["answers"][0],
-                    "pred": res
-                }
-            )
+        
+        answers.append(
+            {
+                "id": item["id"],
+                "question": item["question"],
+                "answer": item["answers"][0],
+                "pred": res
+            }
+        )
 
     return answers
 
@@ -202,7 +177,7 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_72b_7b_wrong1.json","w") as f:
+    with open("query_clf/musique_test2000_72b_7b_wrong1.json","w") as f:
         json.dump(easy1, f, indent=4)
 
     
@@ -218,7 +193,7 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_72b_7b_wrong2.json","w") as f:
+    with open("query_clf/musique_test2000_72b_7b_wrong2.json","w") as f:
         json.dump(easy1, f, indent=4)
 
 
@@ -234,5 +209,5 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_72b_7b_wrong3.json","w") as f:
+    with open("query_clf/musique_test2000_72b_7b_wrong3.json","w") as f:
         json.dump(easy1, f, indent=4)

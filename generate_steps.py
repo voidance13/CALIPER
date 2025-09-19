@@ -15,27 +15,27 @@ def generate_steps(dataset, large_model):
             api_key="vllm",
             base_url="http://localhost:6006/v1",
         )
-    elif large_model == "deepseek-r1" or large_model == "deepseek-v3":
-        # client = OpenAI(
-        #     api_key="sk-609217c7b16a49c7a73e2752906f3acc",
-        #     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        # )
+        large_model_name = "Qwen2.5-72B"
+    elif large_model == "llama3-70B":
         client = OpenAI(
-            api_key="sk-jnomkPZiYo4qHsaGXf1aCniwT71lcENjI3CiUH5IU1OlCHFc",
-            base_url="https://api.lkeap.cloud.tencent.com/v1",
+            api_key="vllm",
+            base_url="http://localhost:6009/v1",
+        )
+        large_model_name = "llama3.1-70b-instruct"
+    elif large_model == "deepseek-r1" or large_model == "deepseek-v3":
+        client = OpenAI(
+            api_key="",
+            base_url="",
         )
 
     result = []
 
     for sample in tqdm(dev):
-        if dataset == "news_articles":
-            question = sample["query"]
-        else:
-            question = sample["question"]
+        question = sample["question"]
         
         try:
             response = client.chat.completions.create(
-                model=large_model,
+                model=large_model_name,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant. Just output steps to answer the given question. Don't use any information that is not given. Don't give any example."},
                     {"role": "user", "content": question},
@@ -46,11 +46,14 @@ def generate_steps(dataset, large_model):
         except:
             res = ""
 
-        sample["72b_generate_steps"] = res
+        sample["steps"] = res
         result.append(sample)
         
     if large_model == "Qwen2.5-72B":
         with open(f"data/{dataset}/test_with_72b_generate_steps.json","w") as f:
+            json.dump(result, f, indent=4)
+    if large_model == "llama3-70B":
+        with open(f"data/{dataset}/test_with_llama3_70b_generate_steps.json","w") as f:
             json.dump(result, f, indent=4)
     elif large_model == "deepseek-r1":
         with open(f"data/{dataset}/test_with_ds_r1_generate_steps.json","w") as f:

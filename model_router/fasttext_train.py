@@ -4,7 +4,7 @@ import jieba
 import json
 import re
 
-stopwords = {word.strip() for word in open('data_detection/stopwords.txt', encoding='utf-8')}
+stopwords = {word.strip() for word in open('model_router/stopwords.txt', encoding='utf-8')}
 
 
 def clean_text(text):
@@ -71,31 +71,31 @@ def preprocess(dataset):
         else:
             musique_test_data.append("__label__0 " + clean_text(sample["question"]) + "\n")
 
-    open(f"data_detection/train/{dataset}_train.txt", 'w', encoding='utf-8').writelines(train_data)
-    open(f"data_detection/train/{dataset}_valid.txt", 'w', encoding='utf-8').writelines(valid_data)
+    open(f"model_router/train/{dataset}_train.txt", 'w', encoding='utf-8').writelines(train_data)
+    open(f"model_router/train/{dataset}_valid.txt", 'w', encoding='utf-8').writelines(valid_data)
 
     total = hotpotqa_test_data
     total.extend(wikimultihopqa_test_data)
     total.extend(musique_test_data)
-    open(f"data_detection/train/{dataset}_test_total600.txt", 'w', encoding='utf-8').writelines(total)
+    open(f"model_router/train/{dataset}_test_total600.txt", 'w', encoding='utf-8').writelines(total)
 
 
 def train(dataset):
-    model = fasttext.train_supervised(input=f"data_detection/train/{dataset}_train.txt",
-                                      autotuneValidationFile=f'data_detection/train/{dataset}_valid.txt',
+    model = fasttext.train_supervised(input=f"model_router/train/{dataset}_train.txt",
+                                      autotuneValidationFile=f'model_router/train/{dataset}_valid.txt',
                                       autotuneDuration=10,
                                     #   autotuneModelSize="60M",
                                       autotuneMetric='f1',
                                       verbose=3)
 
-    model.save_model(f'data_detection/train/{dataset}_train.bin')
+    model.save_model(f'model_router/train/{dataset}_train.bin')
 
 
 def test(dataset):
-    model = fasttext.load_model(f'data_detection/train/{dataset}_train.bin')
+    model = fasttext.load_model(f'model_router/train/{dataset}_train.bin')
 
     samples, inputs = [], []
-    for line in open(f'data_detection/train/{dataset}_test_total600.txt', encoding='utf-8'):
+    for line in open(f'model_router/train/{dataset}_test_total600.txt', encoding='utf-8'):
         sample = line.split()
         samples.append(sample)
         inputs.append(' '.join(sample[1:]))

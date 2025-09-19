@@ -14,6 +14,7 @@ import jieba
 import fasttext
 import torch
 import argparse
+import re
 # import sys
 # sys.path.append('/home/gpt/hgx01_share/lc/Pleias-RAG-Library')
 # import pleias_rag_interface
@@ -40,6 +41,32 @@ def clean_text(text):
     segs = list(filter(lambda x: x not in stopwords, segs))
     return " ".join(segs)
 
+
+def parse_answer(response):
+    try:
+        return response[re.search("Answer:\n", response).end():]
+    except:
+        try: 
+            return response[re.search("answer:\n", response).end():]
+        except:
+            try:
+                return response[re.search("Answer: ", response).end():]
+            except:
+                try:
+                    return response[re.search("answer: ", response).end():]
+                except:
+                    try:
+                        return response[re.search("Answer:", response).end():]
+                    except:
+                        try:
+                            return response[re.search("answer:", response).end():]
+                        except:
+                            line = response.split("\n")[-1]
+                            try:
+                                return line[re.search(": ", line).end():]
+                            except:
+                                return line
+                            
 
 # w/o model router
 def retrieve1(retrieved_path, embed_model, rerank_model, dataset):
@@ -158,141 +185,6 @@ def retrieve2(retrieved_path, embed_model, rerank_model, dataset):
     return retrieved_result
 
 
-# re-write query
-def retrieve3(retrieved_path, embed_model, rerank_model, dataset):
-    embeddings = HuggingFaceBgeEmbeddings(
-        model_name=embed_model,
-        model_kwargs={'device': 'cuda:0'},
-        encode_kwargs={'normalize_embeddings': True},  # set True to compute cosine similarity
-        query_instruction="Represent this sentence for searching relevant passages:"
-    )
-    reranker = BCERerank(
-        model=rerank_model,
-        top_n=10,
-        device="cuda:0",
-        use_fp16=True
-    )
-    with open(f"data/{dataset}/test.json") as file:
-        questions = json.load(file)
-    retrieved_result = []
-
-    for q in tqdm(questions):
-        
-        client = OpenAI(
-            api_key="vllm",
-            base_url="http://localhost:6009/v1",
-        )
-        model_name = "llama3.1-70b-instruct"
-        
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {"role": "system", "content": "Rewrite the given question in another way without changing the meaning. Only output the result of rewriting without explaining."},
-                {"role": "user", "content": q["question"]},
-            ],
-        )
-        rewrite_query = response.choices[0].message.content
-        print(q["question"])
-        print(rewrite_query)
-        
-        texts = []
-        for ctx in q["ctxs"]:
-            for sentence in ctx["sentences"]:
-                texts.append(sentence)
-
-        faiss_vectorstore = FAISS.from_texts(
-            texts=texts, embedding=embeddings, distance_strategy=DistanceStrategy.MAX_INNER_PRODUCT
-        )
-        faiss_retriever = faiss_vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 20})
-
-        retriever = ContextualCompressionRetriever(
-            base_compressor=reranker, base_retriever=faiss_retriever
-        )
-
-        # t = rewrite_query
-        t = q["question"] + " " + rewrite_query
-        retrieved_text = []
-        for srcdoc in retriever.get_relevant_documents(t[:200]):
-            retrieved_text.append(srcdoc.page_content)
-        q["retrieved_text"] = retrieved_text
-        retrieved_result.append(q)
-
-    with open(retrieved_path, 'w', encoding="utf-8") as f:
-        json.dump(retrieved_result, f, ensure_ascii=False, indent=4)
-
-    return retrieved_result
-
-
-# llm Purification
-def retrieve4(retrieved_path, embed_model, rerank_model, dataset):
-    embeddings = HuggingFaceBgeEmbeddings(
-        model_name=embed_model,
-        model_kwargs={'device': 'cuda:0'},
-        encode_kwargs={'normalize_embeddings': True},  # set True to compute cosine similarity
-        query_instruction="Represent this sentence for searching relevant passages:"
-    )
-    reranker = BCERerank(
-        model=rerank_model,
-        top_n=10,
-        device="cuda:0",
-        use_fp16=True
-    )
-    with open(f"data/{dataset}/test.json") as file:
-        questions = json.load(file)
-    retrieved_result = []
-        
-    purification_instruction = "Given a question and a list of sentences, judge which sentences are helpful for answering the question and output these sentences. Only output the helpful sentences. Don't output any other unneccessary words."
-    # INSTRUCTION = "给定一个问题和若干条不同的规则，规则包括规则编号和文本信息。规则的输入格式为：“规则编号：规则文本”。请根据给定的问题和规则，返回对回答问题的帮助最大的一条规则，输出他的规则编号。输出格式为“规则编号：x”，不要输出编号列表以外的文字。输出示例：“规则编号：463”。"
-    
-    client = OpenAI(
-        api_key="vllm",
-        base_url="http://localhost:6008/v1",
-    )
-    model_name = "llama3.1-8b-instruct"
-
-    for q in tqdm(questions):
-        texts = []
-        for ctx in q["ctxs"]:
-            for sentence in ctx["sentences"]:
-                texts.append(sentence)
-
-        faiss_vectorstore = FAISS.from_texts(
-            texts=texts, embedding=embeddings, distance_strategy=DistanceStrategy.MAX_INNER_PRODUCT
-        )
-        faiss_retriever = faiss_vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 20})
-
-        retriever = ContextualCompressionRetriever(
-            base_compressor=reranker, base_retriever=faiss_retriever
-        )
-
-        retrieved_text = []
-        for srcdoc in retriever.get_relevant_documents(q["question"]):
-            retrieved_text.append(srcdoc.page_content)
-        
-        text = ""
-        for t in retrieved_text:
-            text += t + " "    
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {"role": "system", "content": purification_instruction},
-                {"role": "user", "content": "-----------Question-----------\n" + q["question"] + "\n\n-----------Sentences-----------\n" + text[:-1]},
-            ],
-        )
-        res = response.choices[0].message.content
-        print(res)
-        retrieved_text = [res]
-        
-        q["retrieved_text"] = retrieved_text
-        
-        retrieved_result.append(q)
-
-    with open(retrieved_path, 'w', encoding="utf-8") as f:
-        json.dump(retrieved_result, f, ensure_ascii=False, indent=4)
-
-    return retrieved_result
-
-
 def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model="BAAI/bge-base-en-v1.5", rerank_model="BAAI/bge-reranker-large"):
 
     if use_best_hit:
@@ -304,10 +196,9 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
         else:
             retrieved_path = f"data/{dataset}/test_retrieved_embedderft_rerankerft.json"
 
-        # dev = retrieve1(retrieved_path, embed_model, rerank_model, dataset)
+        dev = retrieve1(retrieved_path, embed_model, rerank_model, dataset)
         # dev = retrieve2(retrieved_path, embed_model, rerank_model, dataset)
         # dev = retrieve3(retrieved_path, embed_model, rerank_model, dataset)
-        dev = retrieve4(retrieved_path, embed_model, rerank_model, dataset)
         
     if model == "Qwen2.5-7B":
         client = OpenAI(
@@ -388,7 +279,7 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
                     text += ctxs[supporting_fact[0]][supporting_fact[1]] + "\n"
             text = text[:-1]
         else:
-            for sentence in item["retrieved_text"][:5]:
+            for sentence in item["retrieved_text"]:
                 text += sentence + " "
             text = text[:-1]
 
@@ -400,141 +291,147 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
         prompt1 = "Question:\n" + item["question"] + "\n\nCorpus:\n" + text
         instruction2 = "According to the given question and the reasoning steps, output the complete final answer as short as possible. Specially, if the given question is a yes-no question, just output \"yes\" or \"no\"."
         
-        try:
-            # if model_name in ["Qwen2.5-7B-ft", "Qwen2.5-0.5B", "Qwen2.5-0.5B-ft", "all-Qwen2.5-7B-ft"]:
-            #     messages = [
-            #         {"role": "system", "content": instruction},
-            #         {"role": "user", "content": prompt},
-            #     ]
-            #     res = predict(messages, model, tokenizer)
-            # else:
-            response = client.chat.completions.create(
-                model=model_name,
-                messages=[
-                    {"role": "system", "content": instruction1},
-                    {"role": "user", "content": prompt1},
-                ],
-            )
-            res1 = response.choices[0].message.content
+        # if model_name in ["Qwen2.5-7B-ft", "Qwen2.5-0.5B", "Qwen2.5-0.5B-ft", "all-Qwen2.5-7B-ft"]:
+        #     messages = [
+        #         {"role": "system", "content": instruction},
+        #         {"role": "user", "content": prompt},
+        #     ]
+        #     res = predict(messages, model, tokenizer)
+        # else:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": instruction1},
+                {"role": "user", "content": prompt1},
+            ],
+        )
+        res1 = response.choices[0].message.content
 
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": instruction2},
+                {"role": "user", "content": "----------Question----------\n" + item["question"] + "\n\n----------Steps----------\n" + res1},
+            ],
+        )
+        res2 = response.choices[0].message.content
+        
+        previous_answer = parse_answer(res2)
+        
+        REFLECT_INSTRUCTION = "You are an advanced reasoning agent that can improve based on self reflection. You will be given a question, relevant corpus and a previous answer. Check the answer. According to the question and relevant corpus, if the previous answer is correct, output \"Correct\". Otherwise, diagnose a possible reason for failure and devise a new, concise, high level plan that aims to mitigate the same failure in a few sentences. Use complete sentences."
+
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": REFLECT_INSTRUCTION},
+                {"role": "user", "content": "----------Corpus----------\n" + text + "\n\n----------Question----------\n" + item["question"] + "\n\n----------Previous answer----------\n" + previous_answer},
+            ],
+        )
+        reflection = response.choices[0].message.content
+
+        if ("Correct" in reflection or "correct" in reflection) and "incorrect" not in reflection and "Incorrect" not in reflection:
+            res = res2
+        else:
             response = client.chat.completions.create(
                 model=model_name,
                 messages=[
                     {"role": "system", "content": instruction2},
-                    {"role": "user", "content": "----------Question----------\n" + item["question"] + "\n\n----------Steps----------\n" + res1},
+                    {"role": "user", "content": "----------Steps----------\n" + res1 + "\n\n" + reflection + "\n\n----------Question----------\n" + item["question"]},
                 ],
             )
             res = response.choices[0].message.content
-        except:
-            res = ""
 
         answers.append(
             {
                 "question": item["question"],
                 "answer": item["answers"][0],
-                "res1": res1,
+                "result1": res1,
+                "result2": res2,
+                "reflection": reflection,
                 "pred": res
             }
         )
 
     if use_best_hit and model == "Qwen2.5-7B":
-        with open(f"data/{dataset}/normal_pred_7b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_7b_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
-    # elif use_best_hit and model == "Qwen2.5-7B-ft":
-    #     with open(f"data/{dataset}/normal_pred_7bft_sep_use_best_hit.json","w") as f:
-    #         json.dump(answers, f, indent=4)
     elif use_best_hit and model == "Qwen2.5-0.5B":
-        with open(f"data/{dataset}/normal_pred_05b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_05b_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
-    # elif use_best_hit and model == "Qwen2.5-0.5B-ft":
-    #     with open(f"data/{dataset}/normal_pred_05bft_sep_use_best_hit.json","w") as f:
-    #         json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-7B":
-        with open(f"data/{dataset}/normal_pred_7b_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_7b_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
-    # elif use_best_hit == False and model == "Qwen2.5-7B-ft":
-    #     with open(f"data/{dataset}/normal_pred_7bft_sep.json","w") as f:
-    #         json.dump(answers, f, indent=4)
     elif use_best_hit and model == "Qwen2.5-72B":
-        with open(f"data/{dataset}/normal_pred_72b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_72b_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-72B":
-        with open(f"data/{dataset}/normal_pred_72b_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_72b_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit and model == "llama3-8B":
-        with open(f"data/{dataset}/normal_pred_llama3_8b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_llama3_8b_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "llama3-8B":
-        with open(f"data/{dataset}/normal_pred_llama3_8B_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_llama3_8B_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit and model == "llama3-70B":
-        with open(f"data/{dataset}/normal_pred_llama3_70b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_llama3_70b_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "llama3-70B":
-        with open(f"data/{dataset}/normal_pred_llama3_70B_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_llama3_70B_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit and model == "deepseek-r1":
-        with open(f"data/{dataset}/normal_pred_ds_r1_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_ds_r1_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "deepseek-r1":
-        with open(f"data/{dataset}/normal_pred_ds_r1_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_ds_r1_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit and model == "deepseek-v3":
-        with open(f"data/{dataset}/normal_pred_ds_v3_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_ds_v3_sep_ref_use_best_hit.json","w") as f:
             json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "deepseek-v3":
-        with open(f"data/{dataset}/normal_pred_ds_v3_sep.json","w") as f:
+        with open(f"data/{dataset}/normal_pred_ds_v3_sep_ref.json","w") as f:
             json.dump(answers, f, indent=4)
 
     eval_res = evaluate(answers)
 
     if use_best_hit and model == "Qwen2.5-7B":
-        with open(f"data/{dataset}/eval_normal_pred_7b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_7b_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
-    # elif use_best_hit and model == "Qwen2.5-7B-ft":
-    #     with open(f"data/{dataset}/eval_normal_pred_7bft_sep_use_best_hit.json","w") as f:
-    #         json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "Qwen2.5-0.5B":
-        with open(f"data/{dataset}/eval_normal_pred_05b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_05b_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
-    # elif use_best_hit and model == "Qwen2.5-0.5B-ft":
-    #     with open(f"data/{dataset}/eval_normal_pred_05bft_sep_use_best_hit.json","w") as f:
-    #         json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-7B":
-        with open(f"data/{dataset}/eval_normal_pred_7b_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_7b_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
-    # elif use_best_hit == False and model == "Qwen2.5-7B-ft":
-    #     with open(f"data/{dataset}/eval_normal_pred_7bft_sep.json","w") as f:
-    #         json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "Qwen2.5-72B":
-        with open(f"data/{dataset}/eval_normal_pred_72b_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_72b_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-72B":
-        with open(f"data/{dataset}/eval_normal_pred_72b_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_72b_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "llama3-8B":
-        with open(f"data/{dataset}/eval_normal_pred_llama3_8B_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_llama3_8B_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "llama3-8B":
-        with open(f"data/{dataset}/eval_normal_pred_llama3_8B_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_llama3_8B_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "llama3-70B":
-        with open(f"data/{dataset}/eval_normal_pred_llama3_70B_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_llama3_70B_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "llama3-70B":
-        with open(f"data/{dataset}/eval_normal_pred_llama3_70B_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_llama3_70B_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "deepseek-r1":
-        with open(f"data/{dataset}/eval_normal_pred_ds_r1_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_ds_r1_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "deepseek-r1":
-        with open(f"data/{dataset}/eval_normal_pred_ds_r1_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_ds_r1_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit and model == "deepseek-v3":
-        with open(f"data/{dataset}/eval_normal_pred_ds_v3_sep_use_best_hit.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_ds_v3_sep_ref_use_best_hit.json","w") as f:
             json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "deepseek-v3":
-        with open(f"data/{dataset}/eval_normal_pred_ds_v3_sep.json","w") as f:
+        with open(f"data/{dataset}/eval_normal_pred_ds_v3_sep_ref.json","w") as f:
             json.dump(eval_res, f, indent=4)
 
 

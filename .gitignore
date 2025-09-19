@@ -8,3 +8,4 @@ retrieve_fine_tuning/models/
 *.valid
 *.json
 *.jsonl
+.env

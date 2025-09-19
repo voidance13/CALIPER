@@ -34,13 +34,9 @@ def normal_predict(dataset, use_best_hit=True, model="Qwen2.5-7B"):
             base_url="http://localhost:6006/v1",
         )
     elif model == "deepseek-r1" or model == "deepseek-v3":
-        # client = OpenAI(
-        #     api_key="sk-609217c7b16a49c7a73e2752906f3acc",
-        #     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        # )
         client = OpenAI(
-            api_key="sk-jnomkPZiYo4qHsaGXf1aCniwT71lcENjI3CiUH5IU1OlCHFc",
-            base_url="https://api.lkeap.cloud.tencent.com/v1",
+            api_key="",
+            base_url="",
         )
 
     answers = []
@@ -178,7 +174,7 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_7b_right1.json","w") as f:
+    with open("query_clf/musique_test2000_7b_right1.json","w") as f:
         json.dump(easy1, f, indent=4)
 
     
@@ -194,7 +190,7 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_7b_right2.json","w") as f:
+    with open("query_clf/musique_test2000_7b_right2.json","w") as f:
         json.dump(easy1, f, indent=4)
 
 
@@ -210,5 +206,5 @@ if __name__ == "__main__":
                 # print(pred)
                 easy1.append(sample["id"])
 
-    with open("intent_detection/musique_test2000_7b_right3.json","w") as f:
+    with open("query_clf/musique_test2000_7b_right3.json","w") as f:
         json.dump(easy1, f, indent=4)
