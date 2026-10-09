@@ -1,0 +1,70 @@
+\documentclass[border=3pt]{standalone}
+\usepackage{stix,tikz,pgfplots}
+\usetikzlibrary{arrows.meta}
+\pgfplotsset{compat=1.18}
+\begin{document}
+\begin{minipage}{18cm}
+\centering
+\begin{minipage}[b]{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\linewidth,
+    height=0.62\linewidth,
+    xmin=1, xmax=12,
+    ymin=40, ymax=80,
+    xtick={1,2,3,4,5,6,7,8,9,10,11,12},
+    xticklabels={0.5,0.8,0.9,0.95,0.97,0.974,0.977,0.978,0.99,0.995,0.997,0.999},
+    xticklabel style={rotate=45,anchor=east},
+    xlabel={easy-probability threshold},
+    ylabel={F1 (\%)},
+    grid=major,
+    legend style={at={(0.5,-0.36)},anchor=north,legend columns=3,font=\scriptsize},
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize}
+]
+\addplot[blue,thick,mark=*,mark size=1.45pt] coordinates {(1,68.8116) (2,69.6764) (3,70.0387) (4,70.3858) (5,70.5543) (6,70.6131) (7,70.6367) (8,70.6410) (9,70.8671) (10,70.9876) (11,71.1689) (12,71.2531)};
+\addlegendentry{HotpotQA}
+\addplot[red,thick,mark=square*,mark size=1.45pt] coordinates {(1,45.1579) (2,46.5005) (3,47.4450) (4,48.2006) (5,48.9141) (6,49.0059) (7,49.0864) (8,49.1072) (9,50.1352) (10,50.6458) (11,50.8869) (12,51.0949)};
+\addlegendentry{MuSiQue}
+\addplot[black,thick,mark=triangle*,mark size=1.65pt] coordinates {(1,71.3944) (2,73.0880) (3,74.0745) (4,74.7631) (5,75.1856) (6,75.2130) (7,75.2852) (8,75.3249) (9,75.4695) (10,75.5102) (11,75.5570) (12,75.6269)};
+\addlegendentry{2Wiki}
+\addplot[blue,densely dashed,no marks] coordinates {(6,40) (6,80)};
+\addplot[red,densely dashed,no marks] coordinates {(8,40) (8,80)};
+\addplot[black,densely dashed,no marks] coordinates {(7,40) (7,80)};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\linewidth,
+    height=0.62\linewidth,
+    xmin=1, xmax=12,
+    ymin=0, ymax=100,
+    xtick={1,2,3,4,5,6,7,8,9,10,11,12},
+    xticklabels={0.5,0.8,0.9,0.95,0.97,0.974,0.977,0.978,0.99,0.995,0.997,0.999},
+    xticklabel style={rotate=45,anchor=east},
+    xlabel={easy-probability threshold},
+    ylabel={Cloud-call rate (\%)},
+    grid=major,
+    legend style={at={(0.5,-0.36)},anchor=north,legend columns=3,font=\scriptsize},
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize}
+]
+\addplot[blue,thick,mark=*,mark size=1.45pt] coordinates {(1,31.2627) (2,51.6813) (3,63.6192) (4,73.2343) (5,78.9332) (6,80.7427) (7,81.7151) (8,82.1337) (9,88.1702) (10,92.1675) (11,94.6253) (12,97.6772)};
+\addlegendentry{HotpotQA}
+\addplot[red,thick,mark=square*,mark size=1.45pt] coordinates {(1,66.3754) (2,76.8206) (3,82.3138) (4,86.5169) (5,88.8473) (6,89.7628) (7,90.2206) (8,90.3870) (9,94.2572) (10,96.1715) (11,97.0870) (12,98.5851)};
+\addlegendentry{MuSiQue}
+\addplot[black,thick,mark=triangle*,mark size=1.65pt] coordinates {(1,35.3053) (2,57.3712) (3,73.1552) (4,83.4606) (5,88.9870) (6,90.2672) (7,91.3168) (8,91.6428) (9,96.1196) (10,97.9246) (11,98.8709) (12,99.6978)};
+\addlegendentry{2Wiki}
+\addplot[blue,densely dashed,no marks] coordinates {(6,0) (6,100)};
+\addplot[red,densely dashed,no marks] coordinates {(8,0) (8,100)};
+\addplot[black,densely dashed,no marks] coordinates {(7,0) (7,100)};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\end{minipage}
+\end{document}

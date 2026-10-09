@@ -1,0 +1,218 @@
+"""生成 Table 3 结果可视化报告（table3_result/）。
+
+对 data/*/ 下所有预测文件，用项目评估口径重算平均指标，
+输出 summary.json / summary.md / report.html。
+"""
+import glob
+import json
+import os
+import re
+from collections import Counter
+from pathlib import Path
+
+import regex as _regex
+
+
+BASE = Path("/mnt/data/caliper/code/CALIPER")
+OUT = BASE / "table3_result"
+
+# 只保留这三个实验
+KEEP_FILES = {
+    "normal_pred_72b_sep_use_best_hit.json",  # qwen3.7-plus 直答
+    "normal_pred_7b_sep_use_best_hit.json",   # Qwen2.5-7B 基线
+    "hybrid_pred_7b_72b_sep_use_best_hit_instr_extract100.json",  # CALIPER 纯指令+提取
+}
+DISPLAY = {
+    "normal_pred_72b_sep_use_best_hit.json": "qwen3.7-plus 直答",
+    "normal_pred_7b_sep_use_best_hit.json": "Qwen2.5-7B 基线",
+    "hybrid_pred_7b_72b_sep_use_best_hit_instr_extract100.json": "CALIPER（纯指令+提取）",
+}
+
+
+def normalize_answer(s):
+    def remove_articles(text):
+        return _regex.sub(r"\b(a|an|the)\b", " ", text)
+
+    def white_space_fix(text):
+        return " ".join(text.split())
+
+    def remove_punc(text):
+        return "".join(ch for ch in text if ch not in set('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'))
+
+    return white_space_fix(remove_articles(remove_punc(s.lower())))
+
+
+def parse_answer(response):
+    patterns = ["Answer:\n", "answer:\n", "Answer: ", "answer: ", "Answer:", "answer:"]
+    for p in patterns:
+        m = re.search(re.escape(p), response)
+        if m:
+            return response[m.end():]
+    line = response.split("\n")[-1]
+    m = re.search(": ", line)
+    return line[m.end():] if m else line
+
+
+def eval_hit(pred, answer):
+    return int(normalize_answer(answer) in normalize_answer(pred))
+
+
+def token_f1(pred, gold):
+    p = Counter(pred.split())
+    g = Counter(gold.split())
+    common = sum((p & g).values())
+    if common == 0:
+        return 0.0, 0.0, 0.0
+    prec = common / len(pred.split())
+    rec = common / len(gold.split())
+    return 2 * prec * rec / (prec + rec), prec, rec
+
+
+def metrics_for(recs, key="pred"):
+    hits, f1s, precs, recs_acc = [], [], [], []
+    for r in recs:
+        raw = r.get(key, "") or ""
+        pred = parse_answer(raw) if raw else ""
+        if not pred:
+            hits.append(0)
+            f1s.append(0.0)
+            precs.append(0.0)
+            recs_acc.append(0.0)
+            continue
+        p, g = normalize_answer(pred), normalize_answer(r["answer"])
+        hits.append(eval_hit(pred, r["answer"]))
+        f, pr, rc = token_f1(p, g)
+        f1s.append(f)
+        precs.append(pr)
+        recs_acc.append(rc)
+    n = len(recs_acc) or 1
+    return {
+        "n": len(recs_acc),
+        "hit": sum(hits) / n,
+        "precision": sum(precs) / n,
+        "recall": sum(recs_acc) / n,
+        "f1": sum(f1s) / n,
+    }
+
+
+def sbert_from_eval(pred_path):
+    pred_path = Path(pred_path)
+    name = pred_path.name
+    if name.startswith("normal_pred"):
+        eval_name = "eval_normal_pred" + name[len("normal_pred"):]
+    elif name.startswith("hybrid_pred"):
+        eval_name = "eval_hybrid_pred" + name[len("hybrid_pred"):]
+    else:
+        return None
+    eval_path = pred_path.parent / eval_name
+    if not eval_path.exists():
+        return None
+    try:
+        d = json.load(open(eval_path, encoding="utf-8"))
+        vals = [s.get("SBERT similarity") for s in d if s.get("SBERT similarity") is not None]
+        return sum(vals) / len(vals) if vals else None
+    except Exception:
+        return None
+
+
+def pretty_name(path):
+    name = path.name
+    m = re.search(r"(7b|72b|7b_72b)(.*?)\.json$", name)
+    if not m:
+        return name
+    method = {"7b": "Qwen2.5-7B", "72b": "qwen3.7-plus", "7b_72b": "CALIPER"}[m.group(1)]
+    tag = m.group(2).replace("_sep_use_best_hit", "").replace("_sep", "").strip("_")
+    tag = tag.replace("_use_best_hit", "")
+    return f"{method}" + (f" [{tag}]" if tag else "")
+
+
+def main():
+    OUT.mkdir(exist_ok=True)
+    rows = []
+    pred_files = (
+        glob.glob(str(BASE / "data" / "*" / "normal_pred_*.json"))
+        + glob.glob(str(BASE / "data" / "*" / "hybrid_pred_*.json"))
+    )
+    for pred_path in sorted(pred_files):
+        pred_path = Path(pred_path)
+        if pred_path.name not in KEEP_FILES:
+            continue
+        recs = json.load(open(pred_path, encoding="utf-8"))
+        if not recs:
+            continue
+        m = metrics_for(recs)
+        sbert = sbert_from_eval(pred_path)
+        dataset = pred_path.parent.name
+        if dataset not in ("hotpotqa", "musique", "2wikimultihopqa"):
+            continue
+        rows.append({
+            "dataset": dataset,
+            "file": pred_path.name,
+            "name": DISPLAY.get(pred_path.name, pretty_name(pred_path)),
+            "n": m["n"],
+            "sbert": round(sbert, 4) if sbert is not None else None,
+            "hit": round(m["hit"], 4),
+            "precision": round(m["precision"], 4),
+            "recall": round(m["recall"], 4),
+            "f1": round(m["f1"], 4),
+        })
+
+    # 排序：数据集 + 全量优先 + F1 降序
+    ds_order = {"hotpotqa": 0, "musique": 1, "2wikimultihopqa": 2}
+    rows.sort(key=lambda r: (ds_order.get(r["dataset"], 9), -r["n"], -r["f1"]))
+
+    json.dump(rows, open(OUT / "summary.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+
+    md = ["# Table 3 结果汇总\n", "| 数据集 | 实验 | N | SBERT | Hit | Precision | Recall | F1 |",
+          "|---|---|---:|---:|---:|---:|---:|---:|"]
+    for r in rows:
+        sb = f"{r['sbert']:.4f}" if r["sbert"] is not None else "-"
+        md.append(f"| {r['dataset']} | {r['name']} | {r['n']} | {sb} | {r['hit']:.4f} | {r['precision']:.4f} | {r['recall']:.4f} | {r['f1']:.4f} |")
+    open(OUT / "summary.md", "w", encoding="utf-8").write("\n".join(md))
+
+    # HTML 报告
+    max_f1 = max((r["f1"] for r in rows), default=1.0) or 1.0
+    max_hit = max((r["hit"] for r in rows), default=1.0) or 1.0
+    trs = []
+    for r in rows:
+        f1w = max(2, int(r["f1"] / max_f1 * 100))
+        hitw = max(2, int(r["hit"] / max_hit * 100))
+        sb = f"{r['sbert']:.4f}" if r["sbert"] is not None else "-"
+        trs.append(f"""<tr>
+<td>{r['dataset']}</td><td>{r['name']}</td><td>{r['n']}</td>
+<td>{sb}</td>
+<td class="bar"><div class="bar-fill hit" style="width:{hitw}%"></div><span>{r['hit']:.4f}</span></td>
+<td>{r['precision']:.4f}</td><td>{r['recall']:.4f}</td>
+<td class="bar"><div class="bar-fill f1" style="width:{f1w}%"></div><span>{r['f1']:.4f}</span></td>
+</tr>""")
+    html = f"""<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>CALIPER Table 3 结果</title>
+<style>
+body {{ font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; margin: 24px; background: #f7f8fa; }}
+h1 {{ font-size: 20px; }} h2 {{ font-size: 16px; margin-top: 28px; }}
+table {{ border-collapse: collapse; background: #fff; width: 100%; box-shadow: 0 1px 4px rgba(0,0,0,.08); }}
+th, td {{ border: 1px solid #e3e6ea; padding: 7px 10px; text-align: left; font-size: 13px; }}
+th {{ background: #f0f2f5; }}
+td.bar {{ position: relative; min-width: 140px; }}
+.bar-fill {{ position: absolute; left: 0; top: 0; bottom: 0; opacity: .18; border-radius: 2px; }}
+.bar-fill.f1 {{ background: #2f6fed; }}
+.bar-fill.hit {{ background: #22a06b; }}
+td.bar span {{ position: relative; }}
+.note {{ color: #6b7280; font-size: 12px; margin-top: 12px; }}
+</style></head><body>
+<h1>CALIPER Table 3 结果汇总（{len(rows)} 个实验）</h1>
+<table>
+<tr><th>数据集</th><th>实验</th><th>N</th><th>SBERT</th><th>Hit</th><th>Precision</th><th>Recall</th><th>F1</th></tr>
+{''.join(trs)}
+</table>
+<p class="note">指标口径：parse_answer 提取答案 + 归一化，Hit = 答案出现在生成文本中（与论文一致）。条宽为相对最大值。</p>
+</body></html>"""
+    open(OUT / "report.html", "w", encoding="utf-8").write(html)
+    print("written to", OUT)
+    for r in rows:
+        print(f"{r['dataset']:15s} {r['name'][:38]:38s} n={r['n']:5d} hit={r['hit']:.4f} f1={r['f1']:.4f}")
+
+
+if __name__ == "__main__":
+    main()

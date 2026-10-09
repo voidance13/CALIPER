@@ -1,0 +1,60 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+auth.json
+*.pem
+*.key
+
+# Datasets, evidence, caches, and model artifacts
+data/**
+!data/README.md
+models/**
+!models/README.md
+retrieve_fine_tuning/data/**
+retrieve_fine_tuning/models/**
+query_clf/**/*.bin
+query_clf/**/*.json
+query_clf/**/*.jsonl
+query_clf/train/**
+model_router/train/**
+*.faiss
+*.index
+*.pt
+*.pth
+*.safetensors
+*.bin
+*.ckpt
+
+# Runtime and experiment output
+logs/**
+!logs/README.md
+results/**
+!results/README.md
+*_runs/**
+batch_*/**
+tmp/**
+output/**
+outputs/**
+archives/**
+companion_archive*/**
+*.tar
+*.tar.gz
+*.zip
+
+# Python/build/editor files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.idea/
+.vscode/
+
+# Nested repositories and generated LaTeX files
+external/**/.git/
+*.aux
+*.log
+*.out

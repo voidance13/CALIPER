@@ -1,0 +1,23 @@
+\begin{table*}[pos=t]
+\caption{Answer quality with retrieved evidence and Reflection disabled. Bold values denote column maxima across all methods, including the cloud reference. Samples and baseline definitions are specified in Section~4.1.}
+\label{main}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.2pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc ccccc ccccc}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{5}{c}{\textbf{HotpotQA}} & \multicolumn{5}{c}{\textbf{MuSiQue}} & \multicolumn{5}{c}{\textbf{2WikiMultiHopQA}} \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-11}\cmidrule(lr){12-16}
+& SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 \\
+\midrule
+Local two-stage (Qwen3.5-9B) & 78.90&66.44&69.43&74.63&68.05 & 54.68&31.84&36.62&40.50&36.11 & 79.50&77.12&67.93&78.75&69.86 \\
+Naive RAG (strict) & 77.91&58.38&68.57&66.49&65.46 & 59.71&32.83&42.28&40.35&39.77 & 70.19&55.08&55.45&57.97&55.70 \\
+Adaptive-RAG (adapted) & 79.47&60.23&70.64&68.29&67.49 & 62.62&36.08&46.43&43.62&43.43 & 73.78&60.30&60.21&62.87&60.55 \\
+Always-Multi (adapted C) & 82.05&62.82&74.27&71.08&70.78 & 65.68&38.91&50.76&46.72&47.03 & 75.06&62.11&61.77&64.58&62.20 \\
+CALIPER+clf & 81.93&65.00&72.85&73.17&70.61 & 66.67&43.53&50.80&51.48&49.11 & 84.82&79.12&73.82&80.23&75.29 \\
+CALIPER core & 82.47&64.96&73.73&73.17&71.37 & 68.35&46.44&53.12&54.01&51.56 & 85.00&79.42&74.12&80.43&75.62 \\
+Cloud (Qwen3.7-plus) & \textbf{85.60}&\textbf{71.68}&\textbf{79.73}&\textbf{80.00}&\textbf{77.00} & \textbf{71.79}&\textbf{49.19}&\textbf{57.26}&\textbf{56.53}&\textbf{55.22} & \textbf{86.16}&\textbf{84.10}&\textbf{75.67}&\textbf{84.78}&\textbf{77.19} \\
+\bottomrule
+\end{tabular}}
+\end{table*}

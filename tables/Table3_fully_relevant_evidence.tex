@@ -1,0 +1,18 @@
+\begin{table}[pos=!htb]
+\caption{Answer F1 with fully relevant evidence on 7,405/2,410/12,576 questions (HotpotQA/MuSiQue/2Wiki). All methods use the same questions.}
+\label{inf}
+\centering
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{HotpotQA F1} & \textbf{MuSiQue F1} & \textbf{2Wiki F1} \\
+\midrule
+Local (Qwen3.5-9B) & 69.39 & 49.94 & 63.48 \\
+CALIPER+clf & 74.36 & 55.12 & 73.14 \\
+CALIPER & 75.41 & 56.28 & 74.30 \\
+Cloud (Qwen3.7-plus) & \textbf{83.38} & \textbf{69.70} & \textbf{82.27} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

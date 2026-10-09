@@ -1,0 +1,17 @@
+\begin{table}[pos=!htb]
+\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard$\rightarrow$local denotes misrouted true-hard questions as a fraction of the audit set (HE/$n$).}
+\label{clf}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Dataset} & \textbf{$n$} & \textbf{Acc.} & \textbf{Hard recall} & \textbf{Hard$\rightarrow$local} \\
+\midrule
+HotpotQA & 414 & 41.79 & 87.97 & 3.86 \\
+MuSiQue & 332 & 62.95 & 93.91 & 3.61 \\
+2Wiki & 2,000 & 32.15 & 93.07 & 1.95 \\
+\bottomrule
+\end{tabular}}
+\end{table}

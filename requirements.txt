@@ -1,0 +1,20 @@
+openai>=1.30.0
+python-dotenv>=1.0.0
+jsonlines>=4.0.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-text-splitters>=0.2.0
+langchain-core>=0.2.0
+fasttext>=0.9.2
+jieba>=0.42.1
+regex>=2023.0.0
+sentence-transformers>=2.2.0
+transformers>=4.40.0
+torch>=2.0.0
+tqdm>=4.60.0
+BCEmbedding>=0.1.5
+nltk>=3.8.0
+pydantic>=1.10.0
+faiss-cpu>=1.7.0
+# Optional: modelscope (used by some scripts for tokenizer loading)
+# modelscope>=1.10.0

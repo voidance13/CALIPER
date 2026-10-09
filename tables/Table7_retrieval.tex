@@ -1,0 +1,18 @@
+\begin{table}[pos=!htb]
+\caption{Retrieval-only comparison: mean evidence recall at the top 3/5/10 sentences. MuSiQue uses source-paragraph recall; FT-SEP is the source-known reference.}
+\label{retrieval}
+\centering
+\fontsize{8}{10}\selectfont
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+\textbf{Retriever} & \textbf{HotpotQA} & \textbf{MuSiQue} & \textbf{2Wiki} \\
+\midrule
+BASE & 70.24/80.15/89.61 & 66.96/75.14/83.91 & 62.62/72.01/85.42 \\
+FT-SEP & 80.82/89.91/96.32 & 69.16/78.05/86.94 & 89.37/98.05/99.47 \\
+FT-MER & 73.29/83.80/93.47 & 72.02/81.19/90.37 & 84.50/95.10/98.84 \\
+CALIPER (routed) & 80.43/89.53/96.06 & 67.39/76.57/87.19 & 89.32/98.02/99.43 \\
+\bottomrule
+\end{tabular}}
+\end{table}

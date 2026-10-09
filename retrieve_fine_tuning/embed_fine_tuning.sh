@@ -1,0 +1,23 @@
+CUDA_VISIBLE_DEVICES=2 torchrun --nproc_per_node gpu \
+	-m FlagEmbedding.finetune.embedder.encoder_only.base \
+	--model_name_or_path BAAI/bge-large-en-v1.5 \
+    --train_data retrieve_fine_tuning/musique_bge-embedder-ft.jsonl \
+    --train_group_size 8 \
+    --query_max_len 512 \
+    --passage_max_len 512 \
+    --pad_to_multiple_of 8 \
+    --knowledge_distillation False \
+	--output_dir retrieve_fine_tuning/models/musique_bge-embedder-ft \
+    --overwrite_output_dir \
+    --learning_rate 6e-5 \
+    --fp16 \
+    --num_train_epochs 2 \
+    --per_device_train_batch_size 4 \
+    --gradient_accumulation_steps 8 \
+    --dataloader_drop_last True \
+    --warmup_ratio 0.1 \
+    --gradient_checkpointing \
+    --weight_decay 0.01 \
+    --deepspeed retrieve_fine_tuning/ds_stage0.json \
+    --logging_steps 1 \
+    --save_steps 1000

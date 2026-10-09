@@ -1,0 +1,5 @@
+CALIPER keeps retrieved evidence local during collaborative RAG.
+CALIPER improves over strict Naive RAG on three multi-hop QA benchmarks.
+MuSiQue combines fine-tuned and BASE retrieval streams for local generation.
+A lightweight classifier trades F1 for fewer cloud calls.
+CALIPER lowers estimated latency relative to two-stage cloud reasoning.
