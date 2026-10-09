@@ -1,5 +1,7 @@
 # Staging status: 2026-10-09
 
+Local staging commit: `39cc086` (`chore: stage public CALIPER repository`).
+
 ## Completed
 
 - Created local public-repository staging tree from the A40 CALIPER code directory.
