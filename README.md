@@ -13,9 +13,9 @@ The locality boundary is narrower than a formal privacy guarantee: questions and
 
 ## Repository status
 
-This is a cleaned staging tree for the current frozen paper protocol. It is organized for reading and reproduction planning. Large datasets, model weights, retrieval caches, cloud responses, per-question predictions, logs, and companion archives are intentionally excluded.
+This is a cleaned public tree for the current frozen paper protocol. It is organized for reading and bounded reproduction. Large datasets, model weights, retrieval caches, cloud responses, per-question predictions, logs, and companion archives are intentionally excluded. Exact command templates are in `docs/REPRODUCTION_COMMANDS.md`.
 
-Some historical scripts still depend on the original A40 environment. They are marked as legacy and are not the default entry points. Before a one-command reproduction release, replace remaining machine-specific paths with values from `configs/`.
+Historical scripts are marked as legacy and are not the default entry points. The current root entry points default to the frozen Qwen3.5-9B/Qwen3.7-plus naming; machine-specific paths in table-aggregation scripts remain private and are documented as such.
 
 ## Layout
 
@@ -69,6 +69,8 @@ The current paper source is in `paper/cas-dc-template.tex`. The paper's tables a
 | Figure 3 | classifier threshold analysis scripts | frozen classifier outputs and threshold-sweep records |
 
 The exact current numbers are documented in `paper/Supplementary_Configuration_Notes.md` and the companion archive, not inferred from a fresh run with different models or prompts.
+
+For exact command templates, private input names, and the distinction between live execution and table aggregation, see `docs/REPRODUCTION_COMMANDS.md` and `configs/current_protocol.json`.
 
 ## Setup
 

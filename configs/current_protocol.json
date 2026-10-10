@@ -1,0 +1,34 @@
+{
+  "protocol": "CALIPER frozen paper protocol",
+  "models": {
+    "local_generation": "Qwen3.5-9B",
+    "cloud_reference": "qwen3.7-plus",
+    "embedder_initialization": "BAAI/bge-base-en-v1.5",
+    "reranker_initialization": "BAAI/bge-reranker-large",
+    "metric_encoder": "paraphrase-mpnet-base-v2"
+  },
+  "datasets": ["hotpotqa", "musique", "2wikimultihopqa"],
+  "execution_thresholds": {
+    "hotpotqa": 0.974,
+    "musique": 0.978,
+    "2wikimultihopqa": 0.977
+  },
+  "retrieval": {
+    "dense_candidates": 20,
+    "reranked_context": 10,
+    "generation_context": 5,
+    "musique_base_support_stream": true
+  },
+  "statistics": {
+    "bootstrap_resamples": 10000,
+    "confidence_interval": "percentile-95"
+  },
+  "private_inputs": [
+    "benchmark JSON files under data/<dataset>/",
+    "fine-tuned retriever and reranker checkpoints",
+    "retrieval caches",
+    "execution/source-router checkpoints",
+    "local OpenAI-compatible model service",
+    "cloud provider API key"
+  ]
+}

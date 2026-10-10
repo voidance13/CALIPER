@@ -1,6 +1,7 @@
 """Uniform final evaluation for every Table 2 row."""
 import hashlib
 import json
+import os
 import re
 from collections import Counter
 from pathlib import Path
@@ -8,7 +9,7 @@ from pathlib import Path
 import torch
 from sentence_transformers import SentenceTransformer, util
 
-BASE = Path("/mnt/data/caliper/code/CALIPER")
+BASE = Path(os.getenv("CALIPER_ROOT", Path(__file__).resolve().parents[1]))
 DATASETS = ("hotpotqa", "musique", "2wikimultihopqa")
 SOURCES = {
     "Qwen3.5-9B": {
@@ -91,7 +92,7 @@ def evaluate(model, dataset, source_name):
     }
 
 
-model = SentenceTransformer(str(BASE.parents[1] / "models/paraphrase-mpnet-base-v2"), device="cpu")
+model = SentenceTransformer(os.getenv("CALIPER_METRIC_MODEL", str(BASE / "models/paraphrase-mpnet-base-v2")), device="cpu")
 results = {}
 for method, datasets in SOURCES.items():
     results[method] = {}

@@ -1,10 +1,10 @@
 """消融 V0-V4 五列批量评估(统一 pa/norm + SBERT mpnet)"""
-import json, re, glob, sys
+import json, re, glob, os, sys
 from collections import Counter
 from sentence_transformers import SentenceTransformer, util
 import torch
 
-BASE = "/mnt/data/caliper/code/CALIPER"
+BASE = os.getenv("CALIPER_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PUNCT = set(chr(i) for i in range(33, 48)) | set(chr(i) for i in range(58, 65)) | set(chr(i) for i in range(91, 97)) | set(chr(i) for i in range(123, 127))
 
 def norm(s):
@@ -61,7 +61,7 @@ CONFIGS = [
     ("V3", "2wikimultihopqa", [f"{BASE}/data/2wikimultihopqa/2wikimultihopqa_v3_baseline_ft.json.s*"]),
 ]
 
-model = SentenceTransformer("/mnt/data/caliper/models/paraphrase-mpnet-base-v2", device="cpu")
+model = SentenceTransformer(os.getenv("CALIPER_METRIC_MODEL", os.path.join(BASE, "models/paraphrase-mpnet-base-v2")), device="cpu")
 
 results = {}
 for variant, ds, pats in CONFIGS:

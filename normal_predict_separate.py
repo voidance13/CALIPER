@@ -310,7 +310,7 @@ def retrieve4(retrieved_path, embed_model, rerank_model, dataset):
     return retrieved_result
 
 
-def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model="BAAI/bge-base-en-v1.5", rerank_model="BAAI/bge-reranker-large", max_workers=8, device="cuda:0", tag="", limit=0, no_thinking=False):
+def normal_predict(dataset, use_best_hit=False, model="Qwen3.5-9B", embed_model="BAAI/bge-base-en-v1.5", rerank_model="BAAI/bge-reranker-large", max_workers=8, device="cuda:0", tag="", limit=0, no_thinking=False):
     tag_suffix = f"_{tag}" if tag else ""
 
     if use_best_hit:
@@ -334,7 +334,13 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
     if limit > 0:
         dev = dev[:limit]
 
-    if model == "Qwen2.5-7B":
+    if model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        client = OpenAI(
+            api_key=os.getenv("CALIPER_LOCAL_API_KEY", "vllm"),
+            base_url=os.getenv("CALIPER_LOCAL_BASE_URL") or "http://localhost:6010/v1",
+        )
+        model_name = os.getenv("CALIPER_LOCAL_MODEL_NAME", "Qwen3.5-9B")
+    elif model == "Qwen2.5-7B":
         client = OpenAI(
             api_key="vllm",
             base_url="http://localhost:6010/v1",
@@ -343,7 +349,7 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
     elif model == "Qwen2.5-72B":
         client = OpenAI(
             api_key=aliyun_api_key,
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            base_url=os.getenv("CALIPER_CLOUD_BASE_URL") or "https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         model_name = "qwen3.7-plus"
     elif model == "deepseek-r1":
@@ -482,7 +488,10 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
     results.sort(key=lambda x: x[0])
     answers = [a for _, a in results]
 
-    if use_best_hit and model == "Qwen2.5-7B":
+    if use_best_hit and model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        with open(f"data/{dataset}/normal_pred_qwen35_9b_sep_use_best_hit{tag_suffix}.json", "w") as f:
+            json.dump(answers, f, indent=4)
+    elif use_best_hit and model == "Qwen2.5-7B":
         with open(f"data/{dataset}/normal_pred_7b_sep_use_best_hit{tag_suffix}.json","w") as f:
             json.dump(answers, f, indent=4)
     # elif use_best_hit and model == "Qwen2.5-7B-ft":
@@ -494,6 +503,9 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
     # elif use_best_hit and model == "Qwen2.5-0.5B-ft":
     #     with open(f"data/{dataset}/normal_pred_05bft_sep_use_best_hit.json","w") as f:
     #         json.dump(answers, f, indent=4)
+    elif use_best_hit == False and model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        with open(f"data/{dataset}/normal_pred_qwen35_9b_sep.json", "w") as f:
+            json.dump(answers, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-7B":
         with open(f"data/{dataset}/normal_pred_7b_sep.json","w") as f:
             json.dump(answers, f, indent=4)
@@ -533,7 +545,10 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
 
     eval_res = evaluate(answers)
 
-    if use_best_hit and model == "Qwen2.5-7B":
+    if use_best_hit and model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        with open(f"data/{dataset}/eval_normal_pred_qwen35_9b_sep_use_best_hit{tag_suffix}.json", "w") as f:
+            json.dump(eval_res, f, indent=4)
+    elif use_best_hit and model == "Qwen2.5-7B":
         with open(f"data/{dataset}/eval_normal_pred_7b_sep_use_best_hit{tag_suffix}.json","w") as f:
             json.dump(eval_res, f, indent=4)
     # elif use_best_hit and model == "Qwen2.5-7B-ft":
@@ -545,6 +560,9 @@ def normal_predict(dataset, use_best_hit=False, model="Qwen2.5-7B", embed_model=
     # elif use_best_hit and model == "Qwen2.5-0.5B-ft":
     #     with open(f"data/{dataset}/eval_normal_pred_05bft_sep_use_best_hit.json","w") as f:
     #         json.dump(eval_res, f, indent=4)
+    elif use_best_hit == False and model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        with open(f"data/{dataset}/eval_normal_pred_qwen35_9b_sep.json", "w") as f:
+            json.dump(eval_res, f, indent=4)
     elif use_best_hit == False and model == "Qwen2.5-7B":
         with open(f"data/{dataset}/eval_normal_pred_7b_sep.json","w") as f:
             json.dump(eval_res, f, indent=4)
@@ -587,7 +605,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="2wikimultihopqa")
-    parser.add_argument("--model", default="Qwen2.5-7B", type=str)
+    parser.add_argument("--model", default="Qwen3.5-9B", type=str)
     parser.add_argument("--use_best_hit", action="store_true")
     parser.add_argument("--embed_model", default="BAAI/bge-base-en-v1.5", type=str)
     parser.add_argument("--rerank_model", default="BAAI/bge-reranker-large", type=str)

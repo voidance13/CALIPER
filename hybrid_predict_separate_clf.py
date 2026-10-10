@@ -258,17 +258,17 @@ def retrieve2(retrieved_path, embed_model, rerank_model, dataset, device="cuda:0
     return retrieved_result
 
 
-def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_model="Qwen2.5-72B", embed_model="BAAI/bge-base-en-v1.5", rerank_model="BAAI/bge-reranker-large", max_workers=8, device="cuda:0", use_reflection=False, max_reflect_iter=3, no_thinking=False, tag="", limit=0, random_seed=0):
+def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen3.5-9B", large_model="Qwen3.7-plus", embed_model="BAAI/bge-base-en-v1.5", rerank_model="BAAI/bge-reranker-large", max_workers=8, device="cuda:0", use_reflection=False, max_reflect_iter=3, no_thinking=False, tag="", limit=0, random_seed=0):
     tag_suffix = f"_{tag}" if tag else ""
 
-    if large_model == "Qwen2.5-72B":
+    if large_model in ("Qwen3.7-plus", "Qwen2.5-72B"):
         # generate_steps_client = OpenAI(
         #     api_key="vllm",
         #     base_url="http://localhost:6006/v1",
         # )
         generate_steps_client = OpenAI(
             api_key=aliyun_api_key,
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            base_url=os.getenv("CALIPER_CLOUD_BASE_URL") or "https://dashscope.aliyuncs.com/compatible-mode/v1",
         )
         large_model_name = "qwen3.7-plus"
     elif large_model == "llama3-70B":
@@ -302,7 +302,13 @@ def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_
         dev = dev[:limit]
         orig_idxs = orig_idxs[:limit]
 
-    if small_model == "Qwen2.5-7B":
+    if small_model in ("Qwen3.5-9B", "qwen3.5-9b"):
+        client = OpenAI(
+            api_key=os.getenv("CALIPER_LOCAL_API_KEY", "vllm"),
+            base_url=os.getenv("CALIPER_LOCAL_BASE_URL") or "http://localhost:6012/v1",
+        )
+        small_model_name = os.getenv("CALIPER_LOCAL_MODEL_NAME", "Qwen3.5-9B")
+    elif small_model == "Qwen2.5-7B":
         client = OpenAI(
             api_key="vllm",
             base_url="http://localhost:6012/v1",
@@ -432,6 +438,9 @@ def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_
     answers = [a for _, a in results]
 
     if use_best_hit:
+        if small_model in ("Qwen3.5-9B", "qwen3.5-9b") and large_model in ("Qwen3.7-plus", "Qwen2.5-72B"):
+            with open(f"data/{dataset}/hybrid_pred_qwen35_9b_qwen37_sep_clf_use_best_hit{tag_suffix}.json", "w") as f:
+                json.dump(answers, f, indent=4)
         if small_model == "Qwen2.5-7B" and large_model == "Qwen2.5-72B":
             with open(f"data/{dataset}/hybrid_pred_7b_72b_sep_clf_use_best_hit{tag_suffix}.json","w") as f:
                 json.dump(answers, f, indent=4)
@@ -445,6 +454,9 @@ def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_
             with open(f"data/{dataset}/hybrid_pred_7b_ds_v3_sep_clf_use_best_hit.json","w") as f:
                 json.dump(answers, f, indent=4)
     else:
+        if small_model in ("Qwen3.5-9B", "qwen3.5-9b") and large_model in ("Qwen3.7-plus", "Qwen2.5-72B"):
+            with open(f"data/{dataset}/hybrid_pred_qwen35_9b_qwen37_sep_clf{tag_suffix}.json", "w") as f:
+                json.dump(answers, f, indent=4)
         if small_model == "Qwen2.5-7B" and large_model == "Qwen2.5-72B":
             with open(f"data/{dataset}/hybrid_pred_7b_72b_sep_clf.json","w") as f:
                 json.dump(answers, f, indent=4)
@@ -461,6 +473,9 @@ def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_
     eval_res = evaluate(answers)
 
     if use_best_hit:
+        if small_model in ("Qwen3.5-9B", "qwen3.5-9b") and large_model in ("Qwen3.7-plus", "Qwen2.5-72B"):
+            with open(f"data/{dataset}/eval_hybrid_pred_qwen35_9b_qwen37_sep_clf_use_best_hit{tag_suffix}.json", "w") as f:
+                json.dump(eval_res, f, indent=4)
         if small_model == "Qwen2.5-7B" and large_model == "Qwen2.5-72B":
             with open(f"data/{dataset}/eval_hybrid_pred_7b_72b_sep_clf_use_best_hit{tag_suffix}.json","w") as f:
                 json.dump(eval_res, f, indent=4)
@@ -471,6 +486,9 @@ def hybrid_predict(dataset, use_best_hit=False, small_model="Qwen2.5-7B", large_
             with open(f"data/{dataset}/eval_hybrid_pred_7b_ds_v3_sep_clf_use_best_hit.json","w") as f:
                 json.dump(eval_res, f, indent=4)
     else:
+        if small_model in ("Qwen3.5-9B", "qwen3.5-9b") and large_model in ("Qwen3.7-plus", "Qwen2.5-72B"):
+            with open(f"data/{dataset}/eval_hybrid_pred_qwen35_9b_qwen37_sep_clf{tag_suffix}.json", "w") as f:
+                json.dump(eval_res, f, indent=4)
         if small_model == "Qwen2.5-7B" and large_model == "Qwen2.5-72B":
             with open(f"data/{dataset}/eval_hybrid_pred_7b_72b_sep_clf.json","w") as f:
                 json.dump(eval_res, f, indent=4)
@@ -486,8 +504,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="2wikimultihopqa")
-    parser.add_argument("--small_model", default="Qwen2.5-7B", type=str)
-    parser.add_argument("--large_model", default="Qwen2.5-72B", type=str)
+    parser.add_argument("--small_model", default="Qwen3.5-9B", type=str)
+    parser.add_argument("--large_model", default="Qwen3.7-plus", type=str)
     parser.add_argument("--use_best_hit", action="store_true")
     parser.add_argument("--embed_model", default="BAAI/bge-base-en-v1.5", type=str)
     parser.add_argument("--rerank_model", default="BAAI/bge-reranker-large", type=str)

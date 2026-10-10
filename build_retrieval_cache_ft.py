@@ -26,7 +26,7 @@ def main():
     parser.add_argument("--workers", default=4, type=int)
     args = parser.parse_args()
 
-    ft_root = "retrieve_fine_tuning/models"
+    ft_root = os.getenv("CALIPER_FT_MODEL_ROOT", "retrieve_fine_tuning/models")
     embed_model = f"{ft_root}/{args.dataset}_bge-embedder-ft"
     rerank_model = f"{ft_root}/{args.dataset}_bge-reranker-ft"
     retrieved_path = f"data/{args.dataset}/test_retrieved_embedderft_rerankerft.json"

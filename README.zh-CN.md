@@ -19,7 +19,7 @@ CALIPER 将云端问题指导与本地证据驱动回答分开：
 
 不公开：原始数据、检索证据、模型权重、微调 checkpoint、FAISS 缓存、云端响应、逐题预测、日志、API Key 和大型归档。
 
-当前目录是公开仓库 staging 版本。部分历史脚本仍依赖 A40 服务器路径，统一放在 `legacy/`，不作为默认入口；正式一键复现前还需将剩余机器路径改为 `configs/` 中的配置。
+当前目录是当前冻结协议的公开版本。原始数据、权重、缓存、云端响应、逐题预测、日志和归档均不公开；逐表命令模板见 `docs/REPRODUCTION_COMMANDS.md`。历史脚本统一放在 `legacy/`，不作为默认入口；当前核心入口的默认模型名称已与冻结协议对齐，表格聚合脚本仍需要私有路径和结果文件。
 
 ## 目录
 
@@ -35,7 +35,7 @@ retrieve_fine_tuning/公开的训练脚本模板，不含训练数据和权重
 figures/              Figure 1–3 导出文件及源文件
 tables/               Table 1–7 源片段及编号说明
 paper/                论文源文件、PDF、Highlights 和补充说明
-configs/              环境变量与服务配置模板
+configs/              冻结协议 JSON 与环境变量模板
 data/、models/        占位目录；数据和模型不随仓库发布
 results/、logs/       占位目录；不提交原始输出
 docs/                 协议、边界和发布说明
@@ -52,6 +52,8 @@ docs/                 协议、边界和发布说明
 - 统计使用逐题配对 bootstrap、10,000 次重采样和 percentile 95% 区间。
 
 具体数字以 `paper/Supplementary_Configuration_Notes.md`、论文源文件和冻结归档为准，不能用不同模型、prompt 或缓存直接重跑后替代。
+
+逐表运行命令、私有输入契约和“实时运行/结果聚合”的边界见 `docs/REPRODUCTION_COMMANDS.md` 与 `configs/current_protocol.json`。
 
 ## 复现入口
 

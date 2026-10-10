@@ -6,7 +6,7 @@ from pathlib import Path
 import fasttext, jieba
 from openai import OpenAI
 
-BASE = Path("/mnt/data/caliper/code/CALIPER")
+BASE = Path(os.getenv("CALIPER_ROOT", Path(__file__).resolve().parents[1]))
 DS, PORT = sys.argv[1], sys.argv[2]
 MODE = sys.argv[3] if len(sys.argv) > 3 else "full"
 N, WARMUP, WORKERS, TAU = 200, 20, 4, 0.997
@@ -16,8 +16,8 @@ for line in (BASE / ".env").read_text(encoding="utf-8").splitlines():
         os.environ.setdefault(key.strip(), value.strip())
 
 local = OpenAI(base_url=f"http://localhost:{PORT}/v1", api_key="EMPTY", timeout=120)
-cloud = OpenAI(api_key=os.environ["ALIYUN_API_KEY"], base_url="https://dashscope.aliyuncs.com/compatible-mode/v1", timeout=120)
-classifier = fasttext.load_model(str(BASE / "query_clf/train_new/9b_clf.bin"))
+cloud = OpenAI(api_key=os.environ["ALIYUN_API_KEY"], base_url=os.getenv("CALIPER_CLOUD_BASE_URL") or "https://dashscope.aliyuncs.com/compatible-mode/v1", timeout=120)
+classifier = fasttext.load_model(os.getenv("CALIPER_CLASSIFIER_PATH", str(BASE / "query_clf/train_new/9b_clf.bin")))
 stopwords = {x.strip() for x in open(BASE / "query_clf/stopwords.txt", encoding="utf-8")}
 router_ms = {"hotpotqa": 32.48, "musique": 32.05, "2wikimultihopqa": 32.13}[DS]
 
@@ -31,7 +31,7 @@ def context(item):
 
 def call_local(prompt, max_tokens):
     result = local.chat.completions.create(
-        model="/mnt/data/caliper/models/Qwen3.5-9B", temperature=0.1, max_tokens=max_tokens,
+        model=os.getenv("CALIPER_LOCAL_MODEL_NAME", "Qwen3.5-9B"), temperature=0.1, max_tokens=max_tokens,
         messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
         extra_body={"chat_template_kwargs": {"enable_thinking": False}},
     )

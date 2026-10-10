@@ -1,3 +1,6 @@
 # Configuration templates
 
-Use `.env.example` as the minimal local template. Public code must not contain machine-specific model, dataset, cache, or service paths. The current A40 scripts are preserved for provenance and still require path parameterization before a clean-clone one-command reproduction is claimed.
+- `current_protocol.json` is the machine-readable record of the frozen paper configuration.
+- `.env.example` contains secret and endpoint placeholders only.
+
+The public code does not download private datasets, checkpoints, caches, or API credentials. Set private paths outside the repository and pass them explicitly to the cache builders. The smoke test is dependency-free and does not contact a model or provider.

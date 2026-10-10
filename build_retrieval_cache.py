@@ -16,8 +16,8 @@ from BCERerank import BCERerank
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, type=str)
-    parser.add_argument("--embed_model", default="/mnt/data/caliper/models/bge-base-en-v1.5", type=str)
-    parser.add_argument("--rerank_model", default="/mnt/data/caliper/models/bge-reranker-large", type=str)
+    parser.add_argument("--embed_model", default=os.getenv("CALIPER_EMBED_MODEL", "BAAI/bge-base-en-v1.5"), type=str)
+    parser.add_argument("--rerank_model", default=os.getenv("CALIPER_RERANK_MODEL", "BAAI/bge-reranker-large"), type=str)
     parser.add_argument("--device", default="cuda:1", type=str)
     parser.add_argument("--workers", default=4, type=int)
     args = parser.parse_args()
