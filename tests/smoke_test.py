@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     config = json.loads((ROOT / "configs/current_protocol.json").read_text(encoding="utf-8"))
     assert config["models"]["local_generation"] == "Qwen3.5-9B"
-    assert config["models"]["cloud_reference"] == "qwen3.7-plus"
+    assert config["models"]["cloud_reference"] == "Qwen3.7-plus"
     assert set(config["execution_thresholds"]) == {"hotpotqa", "musique", "2wikimultihopqa"}
     for relative in (
         "hybrid_predict_separate.py",

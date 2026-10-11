@@ -10,6 +10,20 @@ python tests/smoke_test.py
 
 This checks the public configuration and parses the current entry-point files. It does not call a model or an API.
 
+## 1.1 Compile the included manuscript source
+
+```bash
+cd paper
+pdflatex cas-dc-template.tex
+bibtex cas-dc-template
+pdflatex cas-dc-template.tex
+pdflatex cas-dc-template.tex
+```
+
+The CAS class/style files, bibliography, Figure 1 asset, and Figure 2 source
+are included in `paper/`. This is a source-packaging check; it does not
+reproduce the reported experiments.
+
 ## 2. Prepare private resources
 
 Provide the benchmark files as `data/<dataset>/test.json`, the fine-tuned retrieval checkpoints under `retrieve_fine_tuning/models/`, and the private router/classifier checkpoints expected by the selected script. The public repository intentionally does not provide these files.

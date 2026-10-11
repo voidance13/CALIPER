@@ -2,7 +2,7 @@
   "protocol": "CALIPER frozen paper protocol",
   "models": {
     "local_generation": "Qwen3.5-9B",
-    "cloud_reference": "qwen3.7-plus",
+    "cloud_reference": "Qwen3.7-plus",
     "embedder_initialization": "BAAI/bge-base-en-v1.5",
     "reranker_initialization": "BAAI/bge-reranker-large",
     "metric_encoder": "paraphrase-mpnet-base-v2"

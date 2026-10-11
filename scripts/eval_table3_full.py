@@ -1,6 +1,7 @@
 """Rebuild Table 3 on full, question-deduplicated test sets."""
 import hashlib
 import json
+import os
 import re
 import string
 from collections import Counter
@@ -14,7 +15,7 @@ import torch.nn.functional as functional
 from sentence_transformers import SentenceTransformer
 
 
-BASE = Path("/mnt/data/caliper/code/CALIPER")
+BASE = Path(os.environ.get("CALIPER_ROOT", Path(__file__).resolve().parents[1]))
 THRESHOLD = 0.997
 DATASETS = ("hotpotqa", "musique", "2wikimultihopqa")
 SOURCES = {
@@ -101,7 +102,8 @@ def main():
     stopwords_path = BASE / "query_clf/stopwords.txt"
     classifier = fasttext.load_model(str(classifier_path))
     stopwords = {line.strip() for line in stopwords_path.open(encoding="utf-8")}
-    model = SentenceTransformer("/mnt/data/caliper/models/paraphrase-mpnet-base-v2", device="cuda:0")
+    metric_model = os.environ.get("CALIPER_METRIC_MODEL", "paraphrase-mpnet-base-v2")
+    model = SentenceTransformer(metric_model, device="cuda:0")
     result = {
         "status": "full-set unified evaluation",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
