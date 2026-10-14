@@ -231,8 +231,11 @@ where \(\tau\) denotes a temperature parameter that controls the sharpness of th
 
 Following embedding retrieval, the cross-encoder produces a scalar relevance logit \(r_{\theta}(q,d)\) for a query--passage pair and scores one positive passage against sampled negatives using the groupwise cross-entropy in Eq.~\eqref{eq:reranker-loss}:
 \begin{equation}\label{eq:reranker-loss}
-\mathcal{L}_{\text{rer}}=-\sum_{n=1}^{N_{\mathrm{train}}}\log
-\frac{\exp r_{\theta}(q_n,d_n^+)}{\exp r_{\theta}(q_n,d_n^+)+\sum_{m=1}^{M}\exp r_{\theta}(q_n,d_{n,m}^-)}.
+\begin{aligned}
+\mathcal{L}_{\text{rer}}
+&=-\sum_{n=1}^{N_{\mathrm{train}}}\log\\[-2pt]
+&\quad \frac{\exp r_{\theta}(q_n,d_n^+)}{\exp r_{\theta}(q_n,d_n^+)+\sum_{m=1}^{M}\exp r_{\theta}(q_n,d_{n,m}^-)}.
+\end{aligned}
 \end{equation}
 
 At inference, \(\hat{s}=\rho(q)\) selects \((Emb_{\hat{s}},r_{\hat{s}})\) for the two-stage retrieval procedure. Unless noted otherwise, generation uses the top five passages from this fine-tuned stream. MuSiQue additionally uses BASE top-three passages as answer support, forming a dual-stream context. The retrieval-only recall in Table~\ref{retrieval} does not directly measure this combined generation context.
