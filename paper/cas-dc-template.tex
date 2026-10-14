@@ -32,6 +32,22 @@
 \tolerance=2000
 \emergencystretch=1.5em
 
+% PDF metadata for the manuscript record.
+\hypersetup{
+  pdftitle={CALIPER: A Locality-Aware Collaborative Local--Cloud Architecture for Retrieval-Augmented Generation},
+  pdfauthor={Yang Gao, Chao Liao, Xinteng Zhou, Zeyuan Hu, Bingde Hu, Mingli Song},
+  pdfsubject={Retrieval-Augmented Generation}
+}
+% The CAS class rewrites author and subject during \maketitle; reapply the
+% manuscript metadata after that command while keeping the configuration here.
+\AddToHook{cmd/maketitle/after}{%
+  \hypersetup{
+    pdftitle={CALIPER: A Locality-Aware Collaborative Local--Cloud Architecture for Retrieval-Augmented Generation},
+    pdfauthor={Yang Gao, Chao Liao, Xinteng Zhou, Zeyuan Hu, Bingde Hu, Mingli Song},
+    pdfsubject={Retrieval-Augmented Generation}%
+  }%
+}
+
 \begin{document}
 \let\WriteBookmarks\relax
 % Suppress the empty ORCID footnote until identifiers are supplied.
@@ -73,7 +89,7 @@ Retrieval-augmented generation (RAG) grounds answers in external knowledge, addr
 \end{abstract}
 
 \begin{keywords}
-Retrieval-augmented generation \sep Local--cloud collaboration \sep Data locality \sep Multi-hop question answering \sep Adaptive retrieval \sep Large language models
+Retrieval-Augmented Generation \sep Local--Cloud Collaboration \sep Data Locality \sep Multi-Hop Question Answering \sep Adaptive Retrieval \sep Large Language Models
 \end{keywords}
 
 \maketitle
@@ -128,8 +144,9 @@ CALIPER takes a question and its question-specific candidate passages as input. 
 
 \begin{figure*}[pos=t]
 \centering
-\resizebox{\textwidth}{!}{\input{figure2_architecture}}
-\caption{CALIPER architecture. The cloud model receives only the question and returns guidance; retrieval and answering remain local. Source routing and optional execution classification serve separate decisions. Dashed arrows denote optional Reflection.}
+% Use the reviewed standalone export so the manuscript preserves its exact layout.
+\includegraphics[width=\textwidth]{figure_exports/Figure2.pdf}
+\caption{CALIPER architecture. The cloud model receives only the question and returns guidance; retrieval and answering remain local. Source routing and the optional execution classifier serve separate decisions; the classifier box denotes the CALIPER+clf variant. Dashed arrows denote optional Reflection.}
 \label{fig2}
 \end{figure*}
 
@@ -222,7 +239,7 @@ At inference, \(\hat{s}=\rho(q)\) selects \((Emb_{\hat{s}},r_{\hat{s}})\) for th
 
 All retrievers in Table~\ref{retrieval} share the \textit{bge-base-en-v1.5} embedder and \textit{bge-reranker-large} initialization backbones \cite{xiao2024c}, but differ in fine-tuning data and final weights. FT-SEP trains source-specific pairs and is the source-known reference, whereas FT-MER is a system-level merged-data comparator. MuSiQue uses a source-specific first-position embedder with a merged-data reranker for FT-MER; its FT-SEP retrieval-only row uses full-train, while the routed and end-to-end rows use first-position. These configurations make Table~\ref{retrieval} a system-level comparison rather than a single-factor routing ablation. Checkpoint mappings are retained in the Supplementary Configuration Notes. The embedding--reranking pipeline follows established passage-search practice \cite{khattab2020colbert,nogueira2019passage}.
 
-\subsection{Fast Question Classification for Efficient Answering}\label{classifier_method}
+\subsection{Fast Question Classification for Efficient Answering}
 A separate fastText execution classifier estimates local answerability to bypass selected collaborative calls. Source routing chooses an evidence model; execution classification decides whether to use cloud guidance. A false easy prediction can withhold useful assistance, making this a quality--cost decision. Difficulty is operational and model-dependent, not an intrinsic property of the question.
 
 A query is labeled easy only when all three frozen local baseline runs contain the normalized gold answer; otherwise it is labeled hard, as defined in Eq.~\eqref{eq:classifier-label}:
@@ -273,7 +290,7 @@ Evaluation pool
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc ccccc ccccc}
 \toprule
-\multirow{2}{*}{\textbf{Method}} & \multicolumn{5}{c}{\textbf{HotpotQA}} & \multicolumn{5}{c}{\textbf{MuSiQue}} & \multicolumn{5}{c}{\textbf{2WikiMultiHopQA}} \\
+\multirow{2}{*}{\textbf{Method}} & \multicolumn{5}{c}{\textbf{HotpotQA}} & \multicolumn{5}{c}{\textbf{MuSiQue}} & \multicolumn{5}{c}{\textbf{2Wiki}} \\
 \cmidrule(lr){2-6}\cmidrule(lr){7-11}\cmidrule(lr){12-16}
 & SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 \\
 \midrule
@@ -328,7 +345,7 @@ Cloud (Qwen3.7-plus) & \textbf{83.38} & \textbf{69.70} & \textbf{82.27} \\
 
 CALIPER+clf trades some answer quality for fewer collaborative calls; Section~\ref{efficiency_analysis} examines this trade-off. Its thresholds are selected on dataset-specific validation pools disjoint from each corresponding evaluation pool, while the operational difficulty remains specific to the evaluated local model and prompts. Paired-comparison statistics and threshold-selection records are retained in Sections~8 and~14 of the Supplementary Configuration Notes.
 
-An independent generation-quality audit, using a separate matched sample rather than the latency sample, finds CALIPER significantly below the cloud reference on HotpotQA and no significant difference on the other datasets; the latter does not establish equivalence. The matched questions, result file, and statistics are identified in Section~8.4.1 of the Supplementary Configuration Notes.
+An independent audit on a separate matched sample finds CALIPER significantly below the cloud reference on HotpotQA, while no significant difference on the other datasets does not establish equivalence. Details are in Supplementary Section~8.4.1.
 
 \subsection{Ablation Study}
 Table~\ref{ablation} examines collaborative guidance, retrieval adaptation, and optional Reflection. V0 adds Reflection to core V1; V3 removes cloud guidance. V2 uses BASE retrieval with cloud guidance, without source routing or MuSiQue's extra support stream. V4 pairs BASE retrieval with V3's local-generation settings. Exact configurations are retained in the Supplementary Configuration Notes.
@@ -510,7 +527,7 @@ Three MuSiQue examples are selected by a predetermined rule to examine collabora
 \textbf{Answer loss from execution misrouting.} For the MuSiQue question ``Who did the performer of Night Rocker play on Young and Restless?'', the gold answer is \textit{Snapper Foster}. The overlap-free execution classifier assigns an easy probability of 0.997155, above the frozen MuSiQue threshold of 0.978, and selects the local-only path. That path declines to answer, whereas CALIPER's collaborative output returns \textit{Snapper Foster}. The query is operationally hard because one of the three local labeling runs fails to recover the gold answer. This illustrates that high classifier confidence need not imply reliable local answering. Because the paths have different available contexts, the contrast does not isolate the effect of cloud guidance.
 
 \section{Limitations and Deployment Scope}
-The results support CALIPER as a combined workflow with distinct responsibilities, not a claim that every component improves every dataset. Guidance assists evidence use, retrieval adaptation changes the evidence available locally, and execution classification controls whether collaboration occurs. The ablations show that these benefits depend on the setting. Because the latency and main quality evaluations use different protocols, they do not establish a jointly measured quality--latency frontier.
+CALIPER is a combined workflow with three responsibilities: guidance assists evidence use, retrieval adaptation changes the local evidence, and execution classification selects when to invoke collaboration. The ablations show that these benefits depend on the setting. Because the latency and main quality evaluations use different protocols, they do not establish a jointly measured quality--latency frontier.
 
 The evaluation uses one Qwen local--cloud model pair and three Wikipedia-derived multi-hop QA datasets. Transfer to other model families or non-Wikipedia domains remains untested, and dataset identity is only a proxy for domain. Guidance is not evidence-verified by the cloud and may propagate errors when used locally; model changes may also alter its value. Operational-difficulty labels depend on the local model and prompt, so changes to question wording, prompts, or models require revalidation of the execution classifier and threshold. No lightweight-transformer classifier comparison is reported, and retrieval contrasts assess whole configurations rather than the isolated effect of source routing.
 
@@ -522,11 +539,6 @@ Extending CALIPER to new domains requires adapting and maintaining specialized r
 The evaluation protocol, frozen predictions, aggregate metrics, paired-bootstrap outputs, and SHA-256 manifests are retained in the accompanying experimental archive. The accompanying Supplementary Configuration Notes identify the 2Wiki study input and its checksum-manifest locator. Code and selected implementation materials are available at \url{https://github.com/voidance13/CALIPER}. Public sharing of these experimental materials follows the journal's data and material sharing policies.
 
 \section{Conclusion}
-% 2026-09-24 author decision: retain the currently adopted manuscript results;
-% queryonly_repair_20260924_v1 is not adopted automatically.
-% Cache replacement and historical query-only binding are author-confirmed correct (2026-09-30).
-% Evidence category: AUTHOR_ATTESTED; not independently log-verified.
-% See CALIPER_cache_provenance_author_confirmation_20260924.md in project output/.
 We present CALIPER, a collaborative local--cloud RAG framework that separates cloud question guidance from local evidence-grounded answering. The cloud uses only the question to provide guidance, while the local model combines that guidance with retrieved evidence to generate the answer. Source-adapted retrieval supplies evidence suited to the question, and an optional execution classifier bypasses collaboration for questions identified as locally answerable.
 
 Experiments with the evaluated model pair and multi-hop QA tasks show that CALIPER improves answer quality over the local-model baseline and strict Naive RAG, narrowing the gap to the cloud reference. Under the evaluated latency protocol, it also reduces estimated answering latency relative to the two-stage cloud reasoning reference. The optional classifier reduces estimated latency further at some answer-quality cost. Together, the results support question-guided collaboration as a way to strengthen local evidence processing while keeping retrieved evidence local and controlling collaboration overhead.

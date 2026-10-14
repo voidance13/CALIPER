@@ -1,7 +1,9 @@
-# Public release status: 2026-10-11-submission-v1
+# Public release status: 2026-10-14-submission-v2
 
 This release packages the current frozen manuscript protocol and the public
-code/documentation tree. The release commit is recorded in Git history.
+code/documentation tree. The release commit is recorded in Git history. The manuscript source, references,
+Supplementary Configuration Notes, and current figure exports are synchronized
+with Overleaf commit `42525f0`.
 
 ## Completed
 

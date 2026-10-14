@@ -1,0 +1,67 @@
+{
+  "release": "2026-10-14-v10",
+  "status": "CURRENT_MANUSCRIPT_EXPORTS",
+  "source_manuscript_sha256": "aff0875fce539e5e4f88a0f55bfac29306b2e6aa7ffc5c56c4957181e57cabdf",
+  "figure2_source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
+  "Figure1": {
+    "source": "../motivation.pdf",
+    "source_sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7",
+    "operation": "Byte-identical copy of the adopted Figure 1; no original editable drawing file has been newly recovered."
+  },
+  "Figure2": {
+    "source": "../figure2_architecture.tex",
+    "source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
+    "operation": "Reviewed standalone export corresponding to the current TikZ source; the manuscript includes the standalone PDF directly."
+  },
+  "Figure3": {
+    "source": "../cas-dc-template.tex, figure clf_sensitivity",
+    "operation": "Extract both TikZ pictures byte-for-byte (apart from newline normalization); compile side by side. No data points or operating thresholds changed."
+  },
+  "limitations": [
+    "Standalone wrappers control export dimensions; main manuscript inclusion and caption are unchanged.",
+    "These are figure exports, not new experimental measurements.",
+    "The manuscript-referenced export is figure_exports/Figure2.pdf; legacy files under figs/ are not used by the current source."
+  ],
+  "files": [
+    {
+      "path": "Figure1.pdf",
+      "size_bytes": 104335,
+      "sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7"
+    },
+    {
+      "path": "Figure1.png",
+      "size_bytes": 328330,
+      "sha256": "51e5f28f053b9131e5355b79a6ddda0b03645c0e12a08cee556762633b170fab"
+    },
+    {
+      "path": "Figure2.pdf",
+      "size_bytes": 93324,
+      "sha256": "fa532baf1aab4f20fc505f1883aa4c343d5527c770fd9722b0323684beda0a1f"
+    },
+    {
+      "path": "Figure2.png",
+      "size_bytes": 281497,
+      "sha256": "7c3f71c844a5d764022058d6c28b984266295cf2c88532f2c2a596f9447992fe"
+    },
+    {
+      "path": "Figure2.tex",
+      "size_bytes": 197,
+      "sha256": "f3ddfaecdab4e0590f1eb7129edc9f0bcdc4a255fd042617feca2b5d4a64836b"
+    },
+    {
+      "path": "Figure3.pdf",
+      "size_bytes": 59505,
+      "sha256": "3a3ccaddd724ad00964d77311bef41d6b591478dfdec7fd9896d24ac06bf76ae"
+    },
+    {
+      "path": "Figure3.png",
+      "size_bytes": 73627,
+      "sha256": "3d71139ee55cdd4acb12e85ee4dd3d2afffae93e0e971812455509f02ae473f9"
+    },
+    {
+      "path": "Figure3.tex",
+      "size_bytes": 3375,
+      "sha256": "43a2fd79232f09ffce32f8761c2c6e71c0363554c5a7685aa4c4996b7b3b88fa"
+    }
+  ]
+}
