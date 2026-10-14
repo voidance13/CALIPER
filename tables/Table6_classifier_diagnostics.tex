@@ -1,5 +1,5 @@
 \begin{table}[pos=!htb]
-\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard$\rightarrow$local denotes misrouted true-hard questions as a fraction of the audit set (HE/$n$).}
+\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of truly hard questions sent to the local-only branch (HE/$n$).}
 \label{clf}
 \centering
 \small
@@ -7,7 +7,7 @@
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{lrrrr}
 \toprule
-\textbf{Dataset} & \textbf{$n$} & \textbf{Acc.} & \textbf{Hard recall} & \textbf{Hard$\rightarrow$local} \\
+\textbf{Dataset} & \textbf{Audit size ($n$)} & \textbf{Accuracy (\%)} & \textbf{Hard recall (\%)} & \textbf{Hard-to-local (\%)} \\
 \midrule
 HotpotQA & 414 & 41.79 & 87.97 & 3.86 \\
 MuSiQue & 332 & 62.95 & 93.91 & 3.61 \\

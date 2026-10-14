@@ -1,7 +1,7 @@
 {
-  "release": "2026-10-14-v12",
+  "release": "2026-10-14-v13",
   "status": "CURRENT_MANUSCRIPT_EXPORTS",
-  "source_manuscript_sha256": "dd0204d03c02df298970e0610794c4c1ddb405b02cdfde908c7332755dcfae0d",
+  "source_manuscript_sha256": "752929906d35c4190f041368a54e850b83a2c25d74a2a920c26a02bdbacc5b1f",
   "figure2_source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
   "Figure1": {
     "source": "../motivation.pdf",

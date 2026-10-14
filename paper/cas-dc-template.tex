@@ -95,7 +95,7 @@ Retrieval-Augmented Generation \sep Local--Cloud Collaboration \sep Data Localit
 \maketitle
 
 \section{Introduction}
-Retrieval-augmented generation (RAG) grounds language-model answers in external knowledge, reducing reliance on information stored in model parameters \cite{lewis2020retrieval}. For knowledge-intensive questions, retrieval supplies relevant evidence, while the answering model must interpret that evidence and connect it to the question. Using a powerful cloud model is one way to support this process, but it also determines where the evidence is processed.
+Retrieval-augmented generation (RAG) uses external knowledge to ground language-model answers, reducing reliance on information stored in model parameters \cite{lewis2020retrieval}. For knowledge-intensive questions, retrieval supplies relevant evidence, while the answering model must interpret that evidence and connect it to the question. Using a powerful cloud model is one way to support this process, but it also determines where the evidence is processed.
 
 In a conventional cloud RAG workflow, retrieved passages accompany the question to the remote model. When these passages contain internal or sensitive knowledge, this transfer expands the information available outside the local infrastructure. In deployments that require evidence to remain local, sending passages is therefore not simply a performance choice: it conflicts with the evidence-access boundary. Remote evidence processing and answer generation also introduce response-time overhead. Keeping the entire workflow local avoids evidence transfer, but leaves a smaller model responsible for both interpreting evidence and producing the answer. The central challenge is thus to obtain useful cloud assistance without transferring retrieved evidence to the cloud, while controlling the additional latency of collaboration.
 
@@ -296,13 +296,13 @@ Evaluation pool
 \cmidrule(lr){2-6}\cmidrule(lr){7-11}\cmidrule(lr){12-16}
 & SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 & SBERT & Hit & P & R & F1 \\
 \midrule
-Local two-stage (Qwen3.5-9B) & 78.90&66.44&69.43&74.63&68.05 & 54.68&31.84&36.62&40.50&36.11 & 79.50&77.12&67.93&78.75&69.86 \\
+Local & 78.90&66.44&69.43&74.63&68.05 & 54.68&31.84&36.62&40.50&36.11 & 79.50&77.12&67.93&78.75&69.86 \\
 Naive RAG (strict) & 77.91&58.38&68.57&66.49&65.46 & 59.71&32.83&42.28&40.35&39.77 & 70.19&55.08&55.45&57.97&55.70 \\
 Adaptive-RAG (adapted) & 79.47&60.23&70.64&68.29&67.49 & 62.62&36.08&46.43&43.62&43.43 & 73.78&60.30&60.21&62.87&60.55 \\
 Always-Multi (adapted C) & 82.05&62.82&74.27&71.08&70.78 & 65.68&38.91&50.76&46.72&47.03 & 75.06&62.11&61.77&64.58&62.20 \\
 CALIPER+clf & 81.93&65.00&72.85&73.17&70.61 & 66.67&43.53&50.80&51.48&49.11 & 84.82&79.12&73.82&80.23&75.29 \\
-CALIPER core & 82.47&64.96&73.73&73.17&71.37 & 68.35&46.44&53.12&54.01&51.56 & 85.00&79.42&74.12&80.43&75.62 \\
-Cloud (Qwen3.7-plus) & \textbf{85.60}&\textbf{71.68}&\textbf{79.73}&\textbf{80.00}&\textbf{77.00} & \textbf{71.79}&\textbf{49.19}&\textbf{57.26}&\textbf{56.53}&\textbf{55.22} & \textbf{86.16}&\textbf{84.10}&\textbf{75.67}&\textbf{84.78}&\textbf{77.19} \\
+CALIPER & 82.47&64.96&73.73&73.17&71.37 & 68.35&46.44&53.12&54.01&51.56 & 85.00&79.42&74.12&80.43&75.62 \\
+Cloud & \textbf{85.60}&\textbf{71.68}&\textbf{79.73}&\textbf{80.00}&\textbf{77.00} & \textbf{71.79}&\textbf{49.19}&\textbf{57.26}&\textbf{56.53}&\textbf{55.22} & \textbf{86.16}&\textbf{84.10}&\textbf{75.67}&\textbf{84.78}&\textbf{77.19} \\
 \bottomrule
 \end{tabular}}
 \end{table*}
@@ -336,10 +336,10 @@ With fully relevant evidence (Table~\ref{inf}), CALIPER still outperforms the lo
 \toprule
 \textbf{Method} & \textbf{HotpotQA F1} & \textbf{MuSiQue F1} & \textbf{2Wiki F1} \\
 \midrule
-Local (Qwen3.5-9B) & 69.39 & 49.94 & 63.48 \\
+Local & 69.39 & 49.94 & 63.48 \\
 CALIPER+clf & 74.36 & 55.12 & 73.14 \\
 CALIPER & 75.41 & 56.28 & 74.30 \\
-Cloud (Qwen3.7-plus) & \textbf{83.38} & \textbf{69.70} & \textbf{82.27} \\
+Cloud & \textbf{83.38} & \textbf{69.70} & \textbf{82.27} \\
 \bottomrule
 \end{tabular}
 }
@@ -362,7 +362,7 @@ Table~\ref{ablation} examines collaborative guidance, retrieval adaptation, and 
 \textbf{Variant} & \textbf{HotpotQA} & \textbf{MuSiQue} & \textbf{2Wiki} \\
 \midrule
 V0 Core + Reflection & \textbf{72.05} & \textbf{53.61} & 75.46 \\
-V1 CALIPER core & 71.37 & 51.56 & \textbf{75.62} \\
+V1 CALIPER & 71.37 & 51.56 & \textbf{75.62} \\
 V2 BASE + cloud guidance & 69.53 & 52.31 & 72.63 \\
 V3 w/o Synergy & 71.75 & 41.02 & 74.39 \\
 V4 Local + BASE & 67.00 & 40.56 & 62.99 \\
@@ -391,7 +391,7 @@ These branch-aligned latency estimates follow the stage-composition protocol in 
 \toprule
 \textbf{Method} & \textbf{Hotpot} & \textbf{MuSiQue} & \textbf{2Wiki} \\
 \midrule
-\shortstack[l]{Qwen3.5-9B\\baseline}
+Local
 & \shortstack{3.90\\(4.36/4.62)} & \shortstack{4.95\\(5.18/5.76)} & \shortstack{4.11\\(4.46/4.56)} \\
 \midrule
 CALIPER+clf
@@ -399,14 +399,14 @@ CALIPER+clf
 CALIPER
 & \shortstack{6.03\\(5.51/9.37)} & \shortstack{6.36\\(6.31/7.05)} & \shortstack{5.93\\(5.51/6.79)} \\
 \midrule
-\shortstack[l]{Qwen3.7-plus\\deep reasoning}
+Cloud
 & \shortstack{8.90\\(8.78/10.53)} & \shortstack{12.32\\(12.20/15.29)} & \shortstack{9.49\\(9.74/10.80)} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[pos=!htb]
-\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard$\rightarrow$local denotes misrouted true-hard questions as a fraction of the audit set (HE/$n$).}
+\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of truly hard questions sent to the local-only branch (HE/$n$).}
 \label{clf}
 \centering
 \small
@@ -414,7 +414,7 @@ CALIPER
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{lrrrr}
 \toprule
-\textbf{Dataset} & \textbf{$n$} & \textbf{Acc.} & \textbf{Hard recall} & \textbf{Hard$\rightarrow$local} \\
+\textbf{Dataset} & \textbf{Audit size ($n$)} & \textbf{Accuracy (\%)} & \textbf{Hard recall (\%)} & \textbf{Hard-to-local (\%)} \\
 \midrule
 HotpotQA & 414 & 41.79 & 87.97 & 3.86 \\
 MuSiQue & 332 & 62.95 & 93.91 & 3.61 \\
