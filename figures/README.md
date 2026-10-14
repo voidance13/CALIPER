@@ -1,5 +1,5 @@
-# Current CALIPER figure exports: 2026-10-11-submission-v1
+# Current CALIPER figure exports: 2026-10-14-v10
 
-Figure1/2/3.pdf are separate vector figures; matching PNG files are 300-dpi previews. Figure2.tex compiles ../paper/figure2_architecture.tex. Figure3.tex mechanically retains both inline TikZ plots from ../paper/cas-dc-template.tex. Figure1.pdf is byte-identical to ../paper/motivation.pdf; no original editable source is newly recovered.
+Figure1/2/3.pdf are current standalone vector exports; matching PNGs are previews. Figure 2 matches the reviewed PDF used by `../paper/cas-dc-template.tex`. The standalone source wrapper points to `../paper/figure2_architecture.tex`. Figure 3 retains the manuscript's plots without changing data points or thresholds. Figure 1 is byte-identical to `../paper/motivation.pdf`.
 
-See FIGURE_EXPORT_MANIFEST.json for source bindings and file hashes. Main manuscript captions and numeric results are unchanged. These exports do not imply independently verified experimental provenance.
+See `FIGURE_EXPORT_MANIFEST.json` for current source bindings and file hashes. These exports do not represent new experimental measurements.

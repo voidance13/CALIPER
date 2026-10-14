@@ -1,8 +1,8 @@
 {
-  "release": "2026-10-11-submission-v1",
+  "release": "2026-10-14-v10",
   "status": "CURRENT_MANUSCRIPT_EXPORTS",
-  "source_manuscript_sha256": "935025bd8534325906eab780349987e69f865323b4b295094a6d2e079ad592f1",
-  "figure2_source_sha256": "044a92ef2fb05d79896eec3b12e2fd3f51d55a1bff8b90365b2698d55b11a366",
+  "source_manuscript_sha256": "aff0875fce539e5e4f88a0f55bfac29306b2e6aa7ffc5c56c4957181e57cabdf",
+  "figure2_source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
   "Figure1": {
     "source": "../paper/motivation.pdf",
     "source_sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7",
@@ -10,7 +10,8 @@
   },
   "Figure2": {
     "source": "../paper/figure2_architecture.tex",
-    "operation": "Compile the current adopted TikZ source with the repaired Select pair label spacing."
+    "source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
+    "operation": "Reviewed standalone export corresponding to the current TikZ source; the manuscript includes the standalone PDF directly."
   },
   "Figure3": {
     "source": "../paper/cas-dc-template.tex, figure clf_sensitivity",
@@ -18,7 +19,8 @@
   },
   "limitations": [
     "Standalone wrappers control export dimensions; main manuscript inclusion and caption are unchanged.",
-    "These are figure exports, not new experimental measurements."
+    "These are figure exports, not new experimental measurements.",
+    "The manuscript-referenced export is figure_exports/Figure2.pdf; legacy files under figs/ are not used by the current source."
   ],
   "files": [
     {
@@ -33,18 +35,18 @@
     },
     {
       "path": "Figure2.pdf",
-      "size_bytes": 68102,
-      "sha256": "736b5fa1d47cfee618bbf9ad22ce8ffdd6fe979fd9b5b0c8f3b9b049a2b1ab91"
+      "size_bytes": 93324,
+      "sha256": "fa532baf1aab4f20fc505f1883aa4c343d5527c770fd9722b0323684beda0a1f"
     },
     {
       "path": "Figure2.png",
-      "size_bytes": 251501,
-      "sha256": "9bd313abef6ac5cb2d8cc000fa32f12ca3684a3c882015662bae5ef1794944e3"
+      "size_bytes": 281497,
+      "sha256": "7c3f71c844a5d764022058d6c28b984266295cf2c88532f2c2a596f9447992fe"
     },
     {
       "path": "Figure2.tex",
-      "size_bytes": 197,
-      "sha256": "f3ddfaecdab4e0590f1eb7129edc9f0bcdc4a255fd042617feca2b5d4a64836b"
+      "size_bytes": 203,
+      "sha256": "283a7534e38690b61ccec5a894aae675d64d55f65e1702f142a1cfd5468abf7f"
     },
     {
       "path": "Figure3.pdf",
