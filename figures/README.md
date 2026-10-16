@@ -1,5 +1,13 @@
-# Current CALIPER figure exports: 2026-10-14-v13
+# Current CALIPER figure exports
 
-Figure1/2/3.pdf are separate vector figures; matching PNG files are 300-dpi previews. The current manuscript references `figure_exports/Figure2.pdf`, a reviewed standalone export corresponding to `../figure2_architecture.tex`; it does not use the legacy files under `figs/`. Figure3.tex mechanically retains both inline TikZ plots from `../cas-dc-template.tex`. Figure1.pdf is byte-identical to `../motivation.pdf`; no original editable source is newly recovered.
+Release: `2026-10-16-submission-v1`; adopted Overleaf source: `f72ec11e7e690fb9c55af2e6d08172ca3aace237`.
 
-See `FIGURE_EXPORT_MANIFEST.json` for source bindings and current file hashes. Main manuscript captions and numeric results are unchanged. These exports do not imply independently verified experimental provenance.
+Figure 2 is the author-selected `../paper/workflow.pdf`, including the
+offset Reflections connector lanes. `Figure2.pdf` is byte-identical to that
+asset; `Figure2.png` is its existing 300-dpi preview. Compile `Figure2.tex`
+from this directory to reproduce the inclusion. The manuscript itself includes
+`workflow.pdf` directly. The old `figure2_architecture.tex` is historical only.
+
+Figure 1 copies `../paper/motivation.pdf`. Figure 3 retains the manuscript
+threshold plots without changing their data. See `FIGURE_EXPORT_MANIFEST.json`
+for source bindings and exact hashes.

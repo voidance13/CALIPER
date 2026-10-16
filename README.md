@@ -1,8 +1,8 @@
 # CALIPER: Locality-Aware Collaborative Local-Cloud RAG
 
-This repository contains the public code and lightweight documentation for the CALIPER paper submitted to *Neurocomputing*.
+This repository contains the public code and lightweight documentation for the CALIPER paper prepared for submission to *Neurocomputing*.
 
-Public release: `2026-10-14-submission-v2`.
+Public release: `2026-10-16-submission-v1`. Manuscript synchronized with Overleaf `f72ec11` (10 pages, 31 references).
 
 CALIPER separates cloud question guidance from local evidence-grounded answering:
 
@@ -54,6 +54,9 @@ Historical scripts are marked as legacy and are not the default entry points. Th
 - Retrieval initialization: `bge-base-en-v1.5` embedder and `bge-reranker-large` reranker.
 - Datasets: HotpotQA, MuSiQue, and 2WikiMultiHopQA.
 - Execution thresholds: `0.974` / `0.978` / `0.977` for HotpotQA / MuSiQue / 2Wiki.
+- Execution thresholds are selected by known benchmark-pool identity before source routing; unknown-source threshold selection is not evaluated.
+- Retrieval, reranking, and generation use sentence-level units; MuSiQue adds BASE top-three units with normalized-text deduplication.
+- Table 6 reports HE/n over all audited questions, distinct from validation HE/(HE+HH).
 - Table 5: estimated end-to-end latency formed by per-question retrieval and generation timings under the documented protocol; it is not an integrated live measurement.
 - Statistics: paired question-level bootstrap with 10,000 resamples and percentile 95% intervals, as documented in the manuscript and supplementary notes.
 

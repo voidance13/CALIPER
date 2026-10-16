@@ -28,3 +28,7 @@ Table 5 combines per-question retrieval and generation timings under the adopted
 ## Evaluation and statistics
 
 Question-level paired comparisons use 10,000 bootstrap resamples and percentile 95% intervals. Threshold selection uses dataset-specific overlap-free validation pools. Current sample IDs, hashes, and detailed provenance remain in the private companion archive. The dated `legacy/work/repair/` scripts are historical provenance, not a clean current entry point.
+
+## Manuscript clarifications synchronized on 2026-10-16
+
+Known benchmark-pool identity selects the execution threshold before source routing; the router predicts retrieval weights. Unknown-source threshold selection is not evaluated. Retrieval, reranking, and generation operate on sentence-level units, without parent-paragraph expansion. MuSiQue adds BASE top-three units and deduplicates normalized text. Table 7 maps selected MuSiQue units to supporting paragraphs for recall scoring only. Table 6 uses HE/n over all audit questions; validation hard-class false-negative rate uses HE/(HE+HH). Historical segmentation rules are retained in Supplementary Configuration Notes Section 12.4.

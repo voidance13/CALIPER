@@ -1,4 +1,4 @@
-# CALIPER table package (2026-10-14-submission-v2)
+# CALIPER table package (2026-10-16-submission-v1)
 
 These snippets are extracted from the current manuscript source. They are provided for review and submission organization; the manuscript remains the authoritative layout.
 

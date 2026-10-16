@@ -1,4 +1,4 @@
-% Extracted verbatim from the adopted manuscript source; labels and values are unchanged.
+% Extracted verbatim from the adopted Overleaf manuscript.
 
 \begin{table}[pos=!htb]
 \caption{Training-set and evaluation-pool sizes.}
@@ -18,7 +18,6 @@ Evaluation pool
 \bottomrule
 \end{tabular}
 \end{table}
-
 
 \begin{table*}[pos=t]
 \caption{Answer quality with retrieved evidence and Reflection disabled. Bold values denote column maxima across all methods, including the cloud reference. Samples and baseline definitions are specified in Section~4.1.}
@@ -44,7 +43,6 @@ Cloud & \textbf{85.60}&\textbf{71.68}&\textbf{79.73}&\textbf{80.00}&\textbf{77.0
 \end{tabular}}
 \end{table*}
 
-
 \begin{table}[pos=!htb]
 \caption{Answer F1 with fully relevant evidence on 7,405/2,410/12,576 questions (HotpotQA/MuSiQue/2Wiki). All methods use the same questions.}
 \label{inf}
@@ -64,7 +62,6 @@ Cloud & \textbf{83.38} & \textbf{69.70} & \textbf{82.27} \\
 }
 \end{table}
 
-
 \begin{table}[pos=!htb]
 \caption{Ablation F1 on the same questions as Table~\ref{main}. Reflection is enabled only in V0.}
 \label{ablation}
@@ -83,7 +80,6 @@ V4 Local + BASE & 67.00 & 40.56 & 62.99 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
 
 \begin{table}[pos=!htb]
 \caption{Estimated end-to-end latency in seconds: mean (p50/p95), using 200 valid observations per dataset. Stage timings are combined as described in Section~4.1.}
@@ -109,9 +105,8 @@ Cloud
 \end{tabular}
 \end{table}
 
-
 \begin{table}[pos=!htb]
-\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of truly hard questions sent to the local-only branch (HE/$n$).}
+\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of all audited questions that are truly hard and sent to the local-only branch (HE/$n$).}
 \label{clf}
 \centering
 \small
@@ -128,9 +123,8 @@ MuSiQue & 332 & 62.95 & 93.91 & 3.61 \\
 \end{tabular}}
 \end{table}
 
-
 \begin{table}[pos=!htb]
-\caption{Retrieval-only comparison: mean evidence recall at the top 3/5/10 sentences. MuSiQue uses source-paragraph recall; FT-SEP is the source-known reference.}
+\caption{Retrieval-only comparison: mean evidence recall at the top 3/5/10 sentence-level units. MuSiQue maps these units to source paragraphs for recall scoring only; FT-SEP is the source-known reference.}
 \label{retrieval}
 \centering
 \fontsize{8}{10}\selectfont

@@ -1,26 +1,26 @@
 {
-  "release": "2026-10-14-v13",
+  "release": "2026-10-15-workflow-v2",
   "status": "CURRENT_MANUSCRIPT_EXPORTS",
-  "source_manuscript_sha256": "752929906d35c4190f041368a54e850b83a2c25d74a2a920c26a02bdbacc5b1f",
-  "figure2_source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
+  "source_manuscript_sha256": "49bb008dc8f975e0f1f0c98d9fce52254aa71076b5c73cbfff524b9814dad94d",
+  "figure2_source_sha256": "89aada2b219a72cec780d74e3afaf2d5c2e5421f02811697ffc26c1a91bf898d",
   "Figure1": {
     "source": "../motivation.pdf",
     "source_sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7",
     "operation": "Byte-identical copy of the adopted Figure 1; no original editable drawing file has been newly recovered."
   },
   "Figure2": {
-    "source": "../figure2_architecture.tex",
-    "source_sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
-    "operation": "Reviewed standalone export corresponding to the current TikZ source; the manuscript includes the standalone PDF directly."
+    "source": "../workflow.pdf",
+    "source_sha256": "89aada2b219a72cec780d74e3afaf2d5c2e5421f02811697ffc26c1a91bf898d",
+    "operation": "Byte-identical copy of the author-selected workflow.pdf using its existing crop box. The two connector lanes at Reflections are exchanged to avoid crossing. Only those vector paths and their obsolete mask changed; labels, nodes, and other artwork are unchanged. The manuscript includes workflow.pdf directly.",
+    "before_connector_edit_sha256": "82b2630dc298aa188e22040026491468131f5512417c004733f70c2e80d5d842"
   },
   "Figure3": {
     "source": "../cas-dc-template.tex, figure clf_sensitivity",
     "operation": "Extract both TikZ pictures byte-for-byte (apart from newline normalization); compile side by side. No data points or operating thresholds changed."
   },
   "limitations": [
-    "Standalone wrappers control export dimensions; main manuscript inclusion and caption are unchanged.",
-    "These are figure exports, not new experimental measurements.",
-    "The manuscript-referenced export is figure_exports/Figure2.pdf; legacy files under figs/ are not used by the current source."
+    "These exports are figures, not new experimental measurements.",
+    "Figure 2 uses workflow.pdf; figure2_architecture.tex and files under figs/ are retained historical assets and are not used for the current Figure 2."
   ],
   "files": [
     {
@@ -35,18 +35,18 @@
     },
     {
       "path": "Figure2.pdf",
-      "size_bytes": 93324,
-      "sha256": "fa532baf1aab4f20fc505f1883aa4c343d5527c770fd9722b0323684beda0a1f"
+      "size_bytes": 1781340,
+      "sha256": "89aada2b219a72cec780d74e3afaf2d5c2e5421f02811697ffc26c1a91bf898d"
     },
     {
       "path": "Figure2.png",
-      "size_bytes": 281497,
-      "sha256": "7c3f71c844a5d764022058d6c28b984266295cf2c88532f2c2a596f9447992fe"
+      "size_bytes": 1019622,
+      "sha256": "5d2d330a89a289e795e5dba7226e0734eba268e6fe85a90522f86ee5786fa05c"
     },
     {
       "path": "Figure2.tex",
-      "size_bytes": 197,
-      "sha256": "f3ddfaecdab4e0590f1eb7129edc9f0bcdc4a255fd042617feca2b5d4a64836b"
+      "size_bytes": 127,
+      "sha256": "63d8bd992740a151df15d7fd2eb03dad6fc1026a20658551e46cb8cb7b852163"
     },
     {
       "path": "Figure3.pdf",
@@ -60,8 +60,8 @@
     },
     {
       "path": "Figure3.tex",
-      "size_bytes": 3375,
-      "sha256": "43a2fd79232f09ffce32f8761c2c6e71c0363554c5a7685aa4c4996b7b3b88fa"
+      "size_bytes": 3305,
+      "sha256": "34eff7bbf94ab64b2502782780c54dc6a67af1b2c798c9d0a36136e7a6d32420"
     }
   ]
 }

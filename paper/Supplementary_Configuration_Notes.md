@@ -1,6 +1,6 @@
 # CALIPER Supplementary Configuration Notes
 
-Version: 2026-10-07, synchronized manuscript revision. The current companion archive is `2026-10-07-v14` and includes the current manuscript, the October 5–7 review clarifications, Section 17, and the current Table 7 numbering. These notes document retained experiments, the Table 2 Hit scoring correction in Section 13, the classifier-case repair in Section 14, the author's query-only provenance confirmation in Section 15, current Table 5 confidence intervals in Section 16, and the four-question 2Wiki annotation and answer repair in Section 17. The September 30 classifier repair reused existing answers; the October 4 repair generates new answers only for four annotation-corrected questions. The October 5–7 revision documents existing samples and quality-audit evidence without changing observations, statistics, or protocols. Paths below are artifact identifiers relative to the original experiment repository, not portable installation requirements.
+Version: 2026-10-15, method clarifications only. The retained companion archive is `2026-10-07-v14` and includes its manuscript snapshot, the October 5–7 review clarifications, Section 17, and the current Table 7 numbering. These notes document retained experiments, the Table 2 Hit scoring correction in Section 13, the classifier-case repair in Section 14, the author's query-only provenance confirmation in Section 15, current Table 5 confidence intervals in Section 16, and the four-question 2Wiki annotation and answer repair in Section 17. The September 30 classifier repair reused existing answers; the October 4 repair generates new answers only for four annotation-corrected questions. The October 5–7 revision documents existing samples and quality-audit evidence without changing observations, statistics, or protocols. The October 15 clarification distinguishes classifier-metric denominators, states the known-benchmark evaluation setting for threshold selection, and documents sentence-level retrieval and generation, including historical segmentation differences. No table value, threshold, prediction, or experimental protocol is changed, and this update does not record a new companion-archive release. Paths below are artifact identifiers relative to the original experiment repository, not portable installation requirements.
 
 
 Version lineage: the October 1 packaged version superseded `2026-09-30-v8`, bound to paper commit `0dc00b8b7632c8316fb3558baa31969680e4f98c`, and added retained-timing Table 5 confidence intervals, the AI-use declaration, revised Highlights, Figure 2 spacing, and standalone figure exports. The October 4 local revision changed only the 2Wiki cells in Tables 3 and 7, their associated statistics, and annotation-repair documentation. The October 5–6 review-consistency revision was packaged in v13. The October 7 follow-up packaged in v14 clarifies the method execution order, query-only provenance wording, and Table 7 mean-recall wording; it changes no experiment, statistic, table value, Figure 3 point, threshold, sample, or evaluation protocol. Artifact paths containing `candidate` retain their original names and do not by themselves determine adoption. Current Table 3 repair statistics are identified in Section 17; the external current-pointer receipt remains authoritative for completed packaging and synchronization.
@@ -267,13 +267,13 @@ The September 30 vector redraw replaces illustrative query/answer paragraphs wit
 ### Table 6
 
 ```tex
-\caption{Operational-difficulty classifier diagnostics (\%), computed at dataset-specific frozen deployment thresholds 0.974/0.978/0.977 for HotpotQA/MuSiQue/2Wiki. Hard$\rightarrow$local is the fraction of all audit questions that are true-hard but routed locally (HE/$n$).}
+\caption{Operational-difficulty classifier diagnostics (\%), computed at dataset-specific frozen evaluation thresholds 0.974/0.978/0.977 for HotpotQA/MuSiQue/2Wiki. Hard$\rightarrow$local is the fraction of all audit questions that are true-hard but routed locally (HE/$n$).}
 ```
 
 ### Supplementary classifier confusion counts (Section 11)
 
 ```tex
-\caption{Four-way confusion counts for the operational-difficulty classifier at the dataset-specific frozen deployment thresholds 0.974/0.978/0.977. The two-letter codes denote true difficulty followed by predicted difficulty, which maps to local for easy and collaborative for hard: EE (easy/easy), EH (easy/hard), HE (hard/easy), and HH (hard/hard).}
+\caption{Four-way confusion counts for the operational-difficulty classifier at the dataset-specific frozen evaluation thresholds 0.974/0.978/0.977. The two-letter codes denote true difficulty followed by predicted difficulty, which maps to local for easy and collaborative for hard: EE (easy/easy), EH (easy/hard), HE (hard/easy), and HH (hard/hard).}
 ```
 
 ### Table 7
@@ -308,8 +308,12 @@ where \(s_i\) is the dataset-source label. The three source training corpora con
 ### 12.2 Execution-threshold selection
 
 ```tex
-The execution thresholds are frozen at \(t_{\mathrm{HP}}=0.974\), \(t_{\mathrm{Mu}}=0.978\), and \(t_{\mathrm{2Wiki}}=0.977\), each the smallest 0.001-grid value with a hard-to-local false-negative rate at most 10\% on its independent overlap-free validation pool. The corresponding validation sizes are 2,320, 3,080, and 1,371 questions, with hard-to-local false-negative rates 9.75\%, 9.99\%, and 9.50\%, respectively. Table~\ref{clf} and the confusion counts in Section~11 use these dataset-specific operating points.
+The execution thresholds are frozen at \(t_{\mathrm{HP}}=0.974\), \(t_{\mathrm{Mu}}=0.978\), and \(t_{\mathrm{2Wiki}}=0.977\), each the smallest 0.001-grid value with a false-negative rate among truly hard questions at most 10\% on its independent overlap-free validation pool. This conditional rate is HE/(HE + HH), whereas Table~\ref{clf} reports HE/$n$, the fraction of all audited questions that are hard but sent to the local-only branch. The corresponding validation sizes are 2,320, 3,080, and 1,371 questions, with hard-to-local false-negative rates 9.75\%, 9.99\%, and 9.50\%, respectively. Table~\ref{clf} and the confusion counts in Section~11 use these dataset-specific operating points.
 ```
+
+Each benchmark evaluation pool is processed separately. Its known benchmark identity selects the execution threshold before the optional execution gate; this identity is not obtained from the source router. The source router predicts which retrieval weights to use when that branch is taken. No threshold-selection policy is established for requests of unknown source; a separately calibrated deployment policy would be required.
+
+Evidence: `work/repair/finalize_table3_case_20260930.py` iterates over benchmark-specific thresholds, loads each corresponding evaluation pool, and checks the threshold recorded for every recomposed prediction. This is an offline benchmark composition, not evidence of an integrated unknown-source deployment.
 
 ### 12.3 Overlap, classifier training records, and reproducibility
 
@@ -318,6 +322,16 @@ The frozen source and execution-classifier binaries are retained in the accompan
 ```
 
 The execution-classifier validation separation is distinct from the source-router fitting/evaluation separation. The adopted classifier excludes normalized-question overlap with the frozen Table~\ref{main} pools; retained binaries, split records, and manifests support frozen-model inference and threshold-selection reproduction.
+
+### 12.4 Retrieval units, generation context, and retained segmentation
+
+Candidate contexts or paragraphs define the question-specific search space; the independently embedded and reranked items are sentence-level text units. HotpotQA and 2Wiki use the sentence entries in the retained `ctxs[].sentences[]` inputs. Generation consumes the frozen ranked `retrieved_text` strings directly, rather than expanding selected units to full parent paragraphs. It uses the routed top five units; for MuSiQue evaluation questions it additionally merges BASE top-three units, removing duplicates by lowercased, whitespace-normalized text. This extra stream is keyed by the known evaluation dataset, not by the source-router prediction.
+
+For Table 7, k counts the retrieved sentence-level units. HotpotQA and 2Wiki score coverage of gold supporting sentences. MuSiQue maps the retrieved units back to their source paragraphs and scores coverage of gold supporting paragraphs; that mapping is a recall-scoring operation, not a paragraph expansion of the generator input. The retrieval-only comparison does not score the combined MuSiQue generation context.
+
+Retained MuSiQue segmentation is path-specific. The Table 7 BASE, FT-SEP, and FT-MER evaluator uses `nltk.sent_tokenize` on paragraph text. In the routed row, MuSiQue questions predicted as MuSiQue retain NLTK sentence tokenization, whereas MuSiQue questions routed to HotpotQA or 2Wiki retain the helper's literal `. ` splitting. The parent-paragraph recall lookup uses NLTK sentence tokenization and normalized text matching. These historical differences are documented rather than harmonized: this clarification changes neither cached candidates nor reported results. Generation reads its existing retrieval caches without applying a new tokenizer.
+
+Evidence: `build_retrieval_cache.py` (sentence flattening and retrieval), `work/router_e2e_rerun_20260918.py` (`context_for` and generation prompts), `work/run_queryonly_repair_20260924.py` (reuse of that context composition), `scripts/eval_table6_sentence_recall.py`, `scripts/eval_table6_musique_paragraph_recall.py`, `work/rebuild_routed_large_20260921.py`, and the original `work/repair/true_routed_recall_heldout.py` helper (retained under `legacy/work/repair/` in the public repository).
 
 ## 13. Table 2 Hit scoring correction (2026-09-25)
 

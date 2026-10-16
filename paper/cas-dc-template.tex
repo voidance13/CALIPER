@@ -140,47 +140,47 @@ Adaptive execution methods differ in the decision they control. Model cascades a
 CALIPER instead decides whether to invoke question-only cloud guidance, using predicted answerability by the tested local model rather than a model-independent notion of question difficulty. This is separate from choosing a retriever or deciding whether to retrieve more evidence, and is evaluated as an answer-quality--latency trade-off.
 
 \section{Method}
-CALIPER takes a question and its question-specific candidate passages as input. It separates cloud question guidance from local evidence-grounded answering. Figure~\ref{fig2} shows how source routing selects an evidence model, collaborative reasoning combines retrieved passages with guidance, and optional execution classification decides whether to invoke collaboration. These decisions address evidence availability and collaboration cost. The evaluated retrieval search space is the candidate document set supplied with each benchmark question (its contexts or paragraphs), not an index of the full Wikipedia corpus; reported quality and retrieval costs are conditional on these candidate sets.
+CALIPER takes a question and its supplied candidate contexts as input. It separates cloud question guidance from local evidence-grounded answering. Figure~\ref{fig2} shows source-routed retrieval, collaborative reasoning, and optional execution classification. The search space is restricted to each question's supplied contexts or paragraphs, rather than the full Wikipedia corpus. Retrieval, reranking, and generation operate on sentence-level text units extracted from these contexts; reported quality and costs are conditional on this search space.
 
 \begin{figure*}[pos=t]
 \centering
-% Use the reviewed standalone export so the manuscript preserves its exact layout.
-\includegraphics[width=\textwidth]{figure_exports/Figure2.pdf}
-\caption{CALIPER architecture. The cloud model receives only the question and returns guidance; retrieval and answering remain local. Source routing and the optional execution classifier serve separate decisions; the classifier box denotes the CALIPER+clf variant. Dashed arrows denote optional Reflection.}
+% Use the author-selected workflow PDF with its existing crop box.
+\includegraphics[width=\textwidth]{workflow.pdf}
+\caption{CALIPER architecture. The cloud model receives only the question and returns guidance; retrieval and answering remain local. Source routing and the optional execution classifier serve separate decisions; the query classifier denotes the CALIPER+clf variant.}
 \label{fig2}
 \end{figure*}
 
 \subsection{Local--Cloud Synergy with Retrieved-Evidence Locality}
 The cloud offers question-level guidance but cannot verify it against local passages it has not received. CALIPER therefore keeps retrieval, evidence interpretation, and final answer generation local, making assistance available within the evidence-locality boundary.
 
-Let \(q\) denote a question, \(\mathcal{D}(q)=\{d_i\}_{i=1}^{N_q}\) the candidate passages supplied with that question, and \(\hat{s}=\rho(q)\) the source label predicted by the router.
+Let \(q\) denote a question, \(\mathcal{D}(q)=\{d_i\}_{i=1}^{N_q}\) its candidate sentence-level evidence units, and \(\hat{s}=\rho(q)\) the source label predicted by the router.
 
 % Permit a column break before this display instead of moving its lead-in
 % paragraph with the equation and leaving the previous column unfilled.
 \begingroup
 \predisplaypenalty=0
-CALIPER first retrieves passages using the embedder and reranker selected by the source router. The embedder scores question--passage similarity, and the cross-encoder reranks dense-retrieval candidates using both the question and each candidate passage; the two-stage retrieval is defined in Eq.~\eqref{eq:retrieval}.
+The source router selects the embedder and reranker. The embedder scores question--unit similarity; the cross-encoder then reranks dense candidates using query--unit pairs, as defined in Eq.~\eqref{eq:retrieval}.
 \begin{equation}\label{eq:retrieval}
 \begin{aligned}
 \mathcal{C}_K(q)&=\operatorname{TopK}_{d\in\mathcal{D}(q)}\,\operatorname{sim}_{\hat{s}}(q,d),\\
 R(q)&=\operatorname{Topk}_{d\in\mathcal{C}_K(q)}\,r_{\hat{s}}(q,d),
 \end{aligned}
 \end{equation}
-where \(\operatorname{sim}_{\hat{s}}(q,d)=\cos\langle Emb_{\hat{s}}(q),Emb_{\hat{s}}(d)\rangle\), \(r_{\hat{s}}(q,d)\) is the scalar cross-encoder score for the query--passage pair, and \(Emb_{\hat{s}}\) and \(r_{\hat{s}}\) denote the source-selected embedder and reranker. \(\operatorname{TopK}\) returns the ranked dense-retrieval candidate passages, and \(\operatorname{Topk}\) returns the final \(k\) reranked passages; \(K\) and \(k\) are the candidate-pool and final-context sizes, respectively.
+where \(\operatorname{sim}_{\hat{s}}(q,d)=\cos\langle Emb_{\hat{s}}(q),Emb_{\hat{s}}(d)\rangle\), \(r_{\hat{s}}(q,d)\) is the scalar cross-encoder score for the query--unit pair, and \(Emb_{\hat{s}}\) and \(r_{\hat{s}}\) denote the source-selected embedder and reranker. \(\operatorname{TopK}\) returns the ranked dense-retrieval candidate units, and \(\operatorname{Topk}\) returns the final \(k\) reranked units; \(K\) and \(k\) are the candidate-pool and final-context sizes, respectively.
 \par\endgroup
 
 For CALIPER core, the routed context above is used for collaborative generation. In the evaluated CALIPER+clf composition, the operational-difficulty classifier selects frozen local two-stage baseline answers for queries predicted as easy and current core answers for the remainder; the easy branch does not rerun the source router. Operationally, this gate is applied before the collaborative branch: an easy query exits to the frozen local two-stage answer, whereas a hard query proceeds through source-routed retrieval, question-only cloud guidance, and local evidence-grounded generation.
 
 For collaborative inference, the cloud model generates natural-language guidance from the question and its parametric knowledge. The guidance may contain question decomposition, entities or relations to connect, a reasoning sequence, or model-inferred candidate answers, but it has not been verified against local evidence.
 
-The local model receives the question, retrieved passages, and guidance together. The prompt presents the guidance as a reference rather than an authoritative answer, and asks the local model to reason beyond the hints using the local evidence. The cloud output is therefore used as input to local evidence interpretation and answer generation, not returned directly as the final answer. Local generation has two stages: the model first produces a reasoning trace \(h\) using the evidence and guidance, then extracts a concise answer from that trace and the question, as formalized in Eqs.~\eqref{eq:guidance}--\eqref{eq:local-generation}:
+The local model receives the question, retrieved evidence units, and guidance together. The prompt presents the guidance as a reference rather than an authoritative answer, and asks the local model to reason beyond the hints using the local evidence. The cloud output is therefore used as input to local evidence interpretation and answer generation, not returned directly as the final answer. Local generation has two stages: the model first produces a reasoning trace \(h\) using the evidence and guidance, then extracts a concise answer from that trace and the question, as formalized in Eqs.~\eqref{eq:guidance}--\eqref{eq:local-generation}:
 \begin{equation}\label{eq:guidance}
 ins=C_{ins}(q),
 \end{equation}
 \begin{equation}\label{eq:local-generation}
 h=L_{exe}(\operatorname{Pack}(R,q,ins)),\qquad a_0=L_{extract}(h,q),
 \end{equation}
-where \(\operatorname{Pack}\) assembles the retrieved passages, question, and instruction into the local prompt; \(L_{exe}\), \(L_{extract}\), and the reflection operations below are local-model operations, while \(C_{ins}\) is the cloud instruction call.
+where \(\operatorname{Pack}\) assembles the retrieved evidence units, question, and instruction into the local prompt; \(L_{exe}\), \(L_{extract}\), and the reflection operations below are local-model operations, while \(C_{ins}\) is the cloud instruction call.
 
 Guidance provides a question-specific starting point for connecting evidence rather than a generic procedure. Its value depends on the guidance, the retrieved evidence, and the local model's ability to use both; it does not guarantee correct guidance or reliable detection of erroneous hints. The ablation study evaluates its contribution to answer quality.
 
@@ -229,7 +229,7 @@ g(x,y):=\exp\left(\cos\langle Emb(x),Emb(y)\rangle/\tau\right),
 \end{equation}
 where \(\tau\) denotes a temperature parameter that controls the sharpness of the softmax distribution.
 
-Following embedding retrieval, the cross-encoder produces a scalar relevance logit \(r_{\theta}(q,d)\) for a query--passage pair and scores one positive passage against sampled negatives using the groupwise cross-entropy in Eq.~\eqref{eq:reranker-loss}:
+Following embedding retrieval, the cross-encoder produces a scalar relevance logit \(r_{\theta}(q,d)\) for a query--unit pair and scores one positive unit against sampled negatives using the groupwise cross-entropy in Eq.~\eqref{eq:reranker-loss}:
 \begin{equation}\label{eq:reranker-loss}
 \resizebox{0.92\columnwidth}{!}{$\displaystyle
 \mathcal{L}_{\text{rer}}=-\sum_{n=1}^{N_{\mathrm{train}}}\log
@@ -237,7 +237,7 @@ Following embedding retrieval, the cross-encoder produces a scalar relevance log
 $}
 \end{equation}
 
-At inference, \(\hat{s}=\rho(q)\) selects \((Emb_{\hat{s}},r_{\hat{s}})\) for the two-stage retrieval procedure. Unless noted otherwise, generation uses the top five passages from this fine-tuned stream. MuSiQue additionally uses BASE top-three passages as answer support, forming a dual-stream context. The retrieval-only recall in Table~\ref{retrieval} does not directly measure this combined generation context.
+Unless noted otherwise, generation uses the top five reranked sentence-level units directly, without expanding them to parent paragraphs. For MuSiQue evaluation questions, BASE top-three units are merged and deduplicated by lowercased, whitespace-normalized text. The routed row of Table~\ref{retrieval} excludes this additional BASE stream. Segmentation rules appear in the Supplementary Configuration Notes.
 
 All retrievers in Table~\ref{retrieval} share the \textit{bge-base-en-v1.5} embedder and \textit{bge-reranker-large} initialization backbones \cite{xiao2024c}, but differ in fine-tuning data and final weights. FT-SEP trains source-specific pairs and is the source-known reference, whereas FT-MER is a system-level merged-data comparator. MuSiQue uses a source-specific first-position embedder with a merged-data reranker for FT-MER; its FT-SEP retrieval-only row uses full-train, while the routed and end-to-end rows use first-position. These configurations make Table~\ref{retrieval} a system-level comparison rather than a single-factor routing ablation. Checkpoint mappings are retained in the Supplementary Configuration Notes. The embedding--reranking pipeline follows established passage-search practice \cite{khattab2020colbert,nogueira2019passage}.
 
@@ -253,7 +253,7 @@ y_i=\left\{\begin{array}{ll}
 \end{equation}
 The classifier estimates \(p_{easy}=clf(q_i)\). Local-only inference is used when \(p_{easy}\ge t\); otherwise the query is routed to collaborative inference. This model-derived labeling introduces circularity and limits transfer to other model families.
 
-We freeze dataset-specific thresholds \(t_{\mathrm{HP}}=0.974\), \(t_{\mathrm{Mu}}=0.978\), and \(t_{\mathrm{2Wiki}}=0.977\). Each is the smallest value on the 0.001 grid whose hard-to-local false-negative rate is at most 10\% on an overlap-free validation pool. The operating points, split details, and classifier artifacts are retained in the Supplementary Configuration Notes; separation is dataset-specific rather than a global exclusion across all three benchmarks.
+We freeze dataset-specific thresholds \(t_{\mathrm{HP}}=0.974\), \(t_{\mathrm{Mu}}=0.978\), and \(t_{\mathrm{2Wiki}}=0.977\). Each is the smallest 0.001-grid threshold with at most 10\% false negatives among truly hard questions in its overlap-free validation pool. Known benchmark-pool identity selects the threshold before source routing; the router's prediction selects retrieval weights. Threshold selection for unknown-source inputs is not evaluated. Supplementary Configuration Notes document artifacts and dataset-specific separation, which is not a global exclusion across all benchmarks.
 
 
 \section{Experiments}
@@ -406,7 +406,7 @@ Cloud
 \end{table}
 
 \begin{table}[pos=!htb]
-\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of truly hard questions sent to the local-only branch (HE/$n$).}
+\caption{Classifier diagnostics (\%) at dataset-specific thresholds 0.974/0.978/0.977 (HotpotQA/MuSiQue/2Wiki). Hard-to-local is the percentage of all audited questions that are truly hard and sent to the local-only branch (HE/$n$).}
 \label{clf}
 \centering
 \small
@@ -497,7 +497,7 @@ The classifier controls collaboration cost, rather than improving the answer pro
 Table~\ref{retrieval} examines the evidence supplied by the retrieval configurations before generation. CALIPER's source-routed retrieval has higher mean recall than merged training on HotpotQA and 2Wiki, supporting source-specific model selection on those sources. On MuSiQue, it has higher mean recall than BASE at every cutoff but remains below merged training. The result makes the role of retrieval adaptation source-dependent: selecting a specialist can help, but specialization is not a uniform improvement over a shared model.
 
 \begin{table}[pos=!htb]
-\caption{Retrieval-only comparison: mean evidence recall at the top 3/5/10 sentences. MuSiQue uses source-paragraph recall; FT-SEP is the source-known reference.}
+\caption{Retrieval-only comparison: mean evidence recall at the top 3/5/10 sentence-level units. MuSiQue maps these units to source paragraphs for recall scoring only; FT-SEP is the source-known reference.}
 \label{retrieval}
 \centering
 \fontsize{8}{10}\selectfont

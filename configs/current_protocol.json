@@ -7,7 +7,11 @@
     "reranker_initialization": "BAAI/bge-reranker-large",
     "metric_encoder": "paraphrase-mpnet-base-v2"
   },
-  "datasets": ["hotpotqa", "musique", "2wikimultihopqa"],
+  "datasets": [
+    "hotpotqa",
+    "musique",
+    "2wikimultihopqa"
+  ],
   "execution_thresholds": {
     "hotpotqa": 0.974,
     "musique": 0.978,
@@ -17,7 +21,11 @@
     "dense_candidates": 20,
     "reranked_context": 10,
     "generation_context": 5,
-    "musique_base_support_stream": true
+    "musique_base_support_stream": true,
+    "unit": "sentence_level_text",
+    "expand_selected_units_to_parent_paragraphs": false,
+    "musique_base_support_units": 3,
+    "musique_deduplication": "lowercased_whitespace_normalized_text"
   },
   "statistics": {
     "bootstrap_resamples": 10000,
@@ -30,5 +38,11 @@
     "execution/source-router checkpoints",
     "local OpenAI-compatible model service",
     "cloud provider API key"
-  ]
+  ],
+  "execution_threshold_selection_scope": "known_benchmark_evaluation_pool_before_source_routing",
+  "unknown_source_threshold_policy": "not_evaluated",
+  "classifier_metrics": {
+    "hard_to_local_audit_fraction": "HE/n_all_audited_questions",
+    "validation_hard_class_false_negative_rate": "HE/(HE+HH)"
+  }
 }

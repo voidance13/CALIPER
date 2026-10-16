@@ -1,25 +1,17 @@
-# Public release status: 2026-10-14-submission-v2
+# Public release status: 2026-10-16-submission-v1
 
-This release packages the current frozen manuscript protocol and the public
-code/documentation tree. The release commit is recorded in Git history. The manuscript source, references,
-Supplementary Configuration Notes, and current figure exports are synchronized
-with Overleaf commit `42525f0`.
+Manuscript sources, reference PDF, Supplementary Configuration Notes, figures,
+and standalone tables match Overleaf `f72ec11e7e690fb9c55af2e6d08172ca3aace237`. The PDF has 10 pages and
+31 references. Figure 2 uses `paper/workflow.pdf`; the PDF exports match it
+byte-for-byte. All table values and experimental outputs are unchanged.
 
-## Completed
+This synchronization includes metric denominators, known-benchmark threshold
+selection, sentence-level generation context, and historical segmentation
+details. The release commit is recorded in Git history; source hashes are in
+`paper/MANUSCRIPT_RELEASE.json`.
 
-- Created local public-repository staging tree from the A40 CALIPER code directory.
-- Added current paper figures, table source snippets, manuscript source, template assets, and supplementary notes.
-- Removed copied datasets, classifier training pools, nested Git metadata, third-party sample prompts, sample-ID configs, generated screenshots, and Python cache directories.
-- Added public-scope, protocol, license, data, model, result, and log documentation.
-- Added `.env.example` with placeholders only; no real API key was copied.
-
-## Not yet complete
-
-- Remaining research scripts still contain A40-specific absolute paths and service ports.
-- The current public tree is not yet a clean-clone one-command reproduction.
-- Project license selection is pending author decision.
-- GitHub `main` is the public release branch.
-
-## Evidence boundary
-
-This release operation copied code and documentation only. It did not rerun experiments, validate new metrics, or change the frozen paper protocol.
+The public tree excludes private datasets, weights, caches, per-question
+predictions, logs, and credentials. Research scripts may still require private
+paths and services; this is not one-command experimental reproduction.
+Project license selection remains an author decision. No experiments or
+new numerical analyses were run for this manuscript synchronization.

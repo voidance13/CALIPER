@@ -1,0 +1,146 @@
+{
+  "release": "2026-10-16-submission-v1",
+  "prepared": "2026-10-16",
+  "overleaf_commit": "f72ec11e7e690fb9c55af2e6d08172ca3aace237",
+  "pages": 10,
+  "references": 31,
+  "scope": "Manuscript synchronization; no new experiments or table values.",
+  "files": [
+    {
+      "path": "paper/Highlights.txt",
+      "sha256": "4c6188c908ce202f0627cbe2581bd04489bedf5c55b95446c32693e55d340ffc",
+      "size_bytes": 345
+    },
+    {
+      "path": "paper/Supplementary_Configuration_Notes.md",
+      "sha256": "2fb2f87854b4614ded6f652032d47feca992329153ad64cc30a7b23cc7cb4599",
+      "size_bytes": 67806
+    },
+    {
+      "path": "paper/cas-common.sty",
+      "sha256": "e6fc9cc7664aa40083cc4720af421e5d34aea7a19dc12dc33614ea3512a4ecea",
+      "size_bytes": 76652
+    },
+    {
+      "path": "paper/cas-dc-template.tex",
+      "sha256": "49bb008dc8f975e0f1f0c98d9fce52254aa71076b5c73cbfff524b9814dad94d",
+      "size_bytes": 55721
+    },
+    {
+      "path": "paper/cas-dc.cls",
+      "sha256": "ebcccfc804c19c739e4a5c0832cb033b379668288b406153ce04e1b311f16ad3",
+      "size_bytes": 4131
+    },
+    {
+      "path": "paper/figure2_architecture.tex",
+      "sha256": "5507f9562d60d5f47a2cd0979159ac75899bf6569e100582ff2acfea81d08808",
+      "size_bytes": 4498
+    },
+    {
+      "path": "paper/figure_exports/FIGURE_EXPORT_MANIFEST.json",
+      "sha256": "5772f172f191871a2b0196eb03728d0b936c3e0d106fefcad392424903bd8c4c",
+      "size_bytes": 2853
+    },
+    {
+      "path": "paper/figure_exports/Figure1.pdf",
+      "sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7",
+      "size_bytes": 104335
+    },
+    {
+      "path": "paper/figure_exports/Figure1.png",
+      "sha256": "51e5f28f053b9131e5355b79a6ddda0b03645c0e12a08cee556762633b170fab",
+      "size_bytes": 328330
+    },
+    {
+      "path": "paper/figure_exports/Figure2.pdf",
+      "sha256": "89aada2b219a72cec780d74e3afaf2d5c2e5421f02811697ffc26c1a91bf898d",
+      "size_bytes": 1781340
+    },
+    {
+      "path": "paper/figure_exports/Figure2.png",
+      "sha256": "5d2d330a89a289e795e5dba7226e0734eba268e6fe85a90522f86ee5786fa05c",
+      "size_bytes": 1019622
+    },
+    {
+      "path": "paper/figure_exports/Figure2.tex",
+      "sha256": "63d8bd992740a151df15d7fd2eb03dad6fc1026a20658551e46cb8cb7b852163",
+      "size_bytes": 127
+    },
+    {
+      "path": "paper/figure_exports/Figure3.pdf",
+      "sha256": "3a3ccaddd724ad00964d77311bef41d6b591478dfdec7fd9896d24ac06bf76ae",
+      "size_bytes": 59505
+    },
+    {
+      "path": "paper/figure_exports/Figure3.png",
+      "sha256": "3d71139ee55cdd4acb12e85ee4dd3d2afffae93e0e971812455509f02ae473f9",
+      "size_bytes": 73627
+    },
+    {
+      "path": "paper/figure_exports/Figure3.tex",
+      "sha256": "34eff7bbf94ab64b2502782780c54dc6a67af1b2c798c9d0a36136e7a6d32420",
+      "size_bytes": 3305
+    },
+    {
+      "path": "paper/figure_exports/README.md",
+      "sha256": "88c5f56369dbdc1329974c2c8a4b3707c254d60c10def4667cb0d171a126f670",
+      "size_bytes": 705
+    },
+    {
+      "path": "paper/model1-num-names.bst",
+      "sha256": "4d908ac05cfee5a31693673a5f588a158318753b8155c0601fdb91ff7bd05e90",
+      "size_bytes": 28762
+    },
+    {
+      "path": "paper/motivation.pdf",
+      "sha256": "96ec2a750bcde8a46a0e5eb078ec4fd126bcad41cf4b5be5540af0bf495e9df7",
+      "size_bytes": 104335
+    },
+    {
+      "path": "paper/references.bib",
+      "sha256": "16e1df8dd1392ae274927e78e6fba40ffced8a5485e92d97050919b4abfed9d6",
+      "size_bytes": 32856
+    },
+    {
+      "path": "paper/thumbnails/cas-email.jpeg",
+      "sha256": "51cadbff5919f51f76f6f9238b18c9b5d512ea9234cb6d7fef7b53d9767fa845",
+      "size_bytes": 8764
+    },
+    {
+      "path": "paper/thumbnails/cas-facebook.jpeg",
+      "sha256": "ee892a2efc41325af58c7aa5c9356249d68524e796ed2e2da391652a9d2e4294",
+      "size_bytes": 3676
+    },
+    {
+      "path": "paper/thumbnails/cas-gplus.jpeg",
+      "sha256": "7a903863812ac3b33d64c5f774ea549793d2657880874ca6e7d4243f5a51516b",
+      "size_bytes": 7946
+    },
+    {
+      "path": "paper/thumbnails/cas-linkedin.jpeg",
+      "sha256": "3fa7b9ead03ed5d1976316aa1d69157eeeaefae04fab568a4d704185755f7f9f",
+      "size_bytes": 6124
+    },
+    {
+      "path": "paper/thumbnails/cas-twitter.jpeg",
+      "sha256": "bf2765da8cc4cc58fef109fd0f864b4fc39d7ba8e8040c8633542076ccdc91ef",
+      "size_bytes": 4655
+    },
+    {
+      "path": "paper/thumbnails/cas-url.jpeg",
+      "sha256": "66e3c16ef98e082d61397c9644ccae92c227bae49fd7eba5bcad4a6623fd67d5",
+      "size_bytes": 7736
+    },
+    {
+      "path": "paper/workflow.pdf",
+      "sha256": "89aada2b219a72cec780d74e3afaf2d5c2e5421f02811697ffc26c1a91bf898d",
+      "size_bytes": 1781340
+    },
+    {
+      "path": "paper/CALIPER_current_manuscript.pdf",
+      "sha256": "1c7f82863c788a5df10bb1cc7141b07420f9ad09bc539d46f67b9b6f916e8680",
+      "size_bytes": 2233109
+    }
+  ],
+  "source_byte_basis": "Overleaf Git blob bytes; text uses LF. Figure-export manifests are rehashed for portable LF source files."
+}

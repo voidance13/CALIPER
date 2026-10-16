@@ -444,9 +444,6 @@ FUNCTION {format.note}
 
 FUNCTION {format.title}
 { title
-  duplicate$ empty$ 'skip$
-    { "t" change.case$ }
-  if$
   "title" bibinfo.check
 }
 
@@ -921,6 +918,7 @@ FUNCTION {article}
   if$
   format.journal.pages
   new.sentence
+  print.doi output
   format.note output
   fin.entry
 }
